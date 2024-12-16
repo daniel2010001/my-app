@@ -1,15 +1,13 @@
 "use client";
 
-import { createControlComponent } from "@react-leaflet/core";
 import L from "leaflet";
 import { useState } from "react";
 import { MapContainer, Marker, TileLayer, useMapEvents } from "react-leaflet";
 
-import { useMapStore } from "@/store";
 import { PointFormModal } from "./point-form";
 
+import { useMapStore } from "@/store";
 import "leaflet/dist/leaflet.css";
-import { Point } from "@/models";
 
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
@@ -43,26 +41,6 @@ function ClickHandler({ isMarking }: { isMarking: boolean }) {
   ) : null;
 }
 
-const createRoutineMachineLayer = (props: { origin: Point; destination: Point }) => {
-  const instance = L.Routing.control({
-    waypoints: [
-      L.latLng(props.origin.lat, props.origin.lng),
-      L.latLng(props.destination.lat, props.destination.lng),
-    ],
-    lineOptions: { styles: [{ color: "#6FA1EC", weight: 4 }] },
-    show: false,
-    addWaypoints: false,
-    routeWhileDragging: true,
-    draggableWaypoints: true,
-    fitSelectedRoutes: true,
-    showAlternatives: false,
-  });
-
-  return instance;
-};
-
-const RoutingMachine = createControlComponent(createRoutineMachineLayer);
-
 interface MapProps {
   isMarking: boolean;
 }
@@ -70,7 +48,7 @@ interface MapProps {
 export default function Map({ isMarking }: MapProps) {
   const points = useMapStore((state) => state.points);
   return (
-    <MapContainer center={[40.4168, -3.7038]} zoom={13} className="relative w-full h-full">
+    <MapContainer center={[-17.392352, -66.159042]} zoom={13} className="relative w-full h-full">
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -79,9 +57,6 @@ export default function Map({ isMarking }: MapProps) {
       {points.map((punto, index) => (
         <Marker key={index} position={[punto.lat, punto.lng]} title={punto.name} />
       ))}
-      <Marker position={[40.4168, -3.7038]} title="Madrid" />
-      <Marker position={[41.3851, 2.1734]} title="Barcelona" />
-      <RoutingMachine />
     </MapContainer>
   );
 }
