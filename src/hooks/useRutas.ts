@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import axiosInstance from '../lib/axios.lib';
+import { useState, useEffect } from "react";
+import { axiosInstance } from "../lib/axios.lib";
 
 export interface Ruta {
   id: number;
@@ -19,12 +19,12 @@ export const useRutas = () => {
   useEffect(() => {
     const fetchRutas = async () => {
       try {
-        const response = await axiosInstance.get<Ruta[]>('/api/rutas');
+        const response = await axiosInstance.get<Ruta[]>("/api/rutas");
         setRutas(response.data);
       } catch (err) {
         console.log(err);
-        
-        setError('Error fetching rutas');
+
+        setError("Error fetching rutas");
       } finally {
         setLoading(false);
       }
