@@ -1,10 +1,22 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 
+import { RouteAdapter } from "@/adapters";
 import { Button } from "@/components/ui/button";
+import { ButtonTitle } from "@/components/ui/button-title";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Combobox } from "@/components/ui/combobox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -15,6 +27,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
@@ -24,35 +37,39 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Cars, Detail, Details, RouteFormData, routeSchema, Snapping, Snappings } from "@/models";
-import { ButtonTitle } from "@/components/ui/button-title";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-import { ChevronDown, Loader2, MapPin } from "lucide-react";
 import { loadAbortable } from "@/lib";
+import {
+  Cars,
+  Detail,
+  Details,
+  Point,
+  RouteFormData,
+  routeSchema,
+  Snapping,
+  Snappings,
+} from "@/models";
 import { getRoute } from "@/services";
-import { RouteAdapter } from "@/adapters";
 import { useMapStore } from "@/store";
 
-export function RouteForm() {
+import { ChevronDown, Loader2, Plus } from "lucide-react";
+
+interface RouteFormProps {
+  isOpen: boolean;
+  toggle: () => void;
+  points: Point[];
+}
+
+export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
+  const [reset, setReset] = useState(true);
   const setRoutePoints = useMapStore((state) => state.setRoutePoints);
+
   const form = useForm<RouteFormData>({
     resolver: zodResolver(routeSchema),
     defaultValues: {
       vehicle: "car",
-      points: [
-        [0, 0],
-        [0, 0],
-      ],
+      points: [],
+      coordinates: [],
       point_hints: [],
       snap_preventions: [],
       details: [],
@@ -60,40 +77,48 @@ export function RouteForm() {
       instructions: false,
     },
   });
+  // const {
+  //   fields: pointFields,
+  //   append: appendPoint,
+  //   remove: removePoint,
+  // } = useFieldArray({ control: form.control, name: "points" });
 
   const {
-    fields: pointFields,
-    append: appendPoint,
-    remove: removePoint,
-  } = useFieldArray({
-    control: form.control,
-    name: "points",
-  });
+    fields: coordinateFields,
+    append: appendCoordinate,
+    remove: removeCoordinate,
+  } = useFieldArray({ control: form.control, name: "coordinates" });
 
   const {
     fields: hintFields,
     append: appendHint,
     remove: removeHint,
-  } = useFieldArray({
-    control: form.control,
-    name: "point_hints" as "points",
-  });
+  } = useFieldArray({ control: form.control, name: "point_hints" as "coordinates" });
 
   async function onSubmit(data: RouteFormData) {
     const response = await loadAbortable(getRoute(data));
     if (!response || response instanceof Error) return;
     const routes = response.data.map(RouteAdapter.toRoute);
     setRoutePoints(routes.map(({ points }) => points));
-    // form.reset();
+    if (reset) form.reset();
+    toggle();
+  }
+
+  function onReset() {
+    toggle();
+    if (reset) form.reset();
+  }
+
+  function selectPoint(id: string) {
+    const point = points.find((point) => point.id === id);
+    if (!point) return;
+    const formPoints = form.watch("points");
+    formPoints.push([point.lng, point.lat]);
+    form.setValue("points", formPoints);
   }
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <ButtonTitle variant="default" size={"icon"} title="Generar ruta">
-          <MapPin />
-        </ButtonTitle>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onReset}>
       <DialogContent className="sm:max-w-[425px]">
         <Tabs defaultValue="basic" className="w-full">
           <DialogHeader>
@@ -133,41 +158,79 @@ export function RouteForm() {
                     </FormItem>
                   )}
                 />
-                <div>
-                  <FormLabel>Puntos</FormLabel>
-                  {pointFields.map((field, index) => (
-                    <div key={field.id} className="flex items-center space-x-2 mt-2">
-                      <Input
-                        {...form.register(`points.${index}.0` as const, { valueAsNumber: true })}
-                        placeholder="Latitud"
-                      />
-                      <Input
-                        {...form.register(`points.${index}.1` as const, { valueAsNumber: true })}
-                        placeholder="Longitud"
-                      />
+
+                <Combobox
+                  options={points.map(({ id, name }) => ({ value: id, label: name }))}
+                  value={
+                    form.watch("points").length > 0
+                      ? `${form.watch("points").length} seleccionados`
+                      : ""
+                  }
+                  onChange={selectPoint}
+                />
+
+                <div className="flex flex-col space-y-2">
+                  <div className="flex items-center justify-between">
+                    <FormLabel className="">Puntos</FormLabel>
+                    <ButtonTitle
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => appendCoordinate([[0, 0]])}
+                      className="hover:bg-green-300"
+                      title="Agregar Coordenada (lat, lng)"
+                    >
+                      <Plus />
+                    </ButtonTitle>
+                  </div>
+                  {coordinateFields.map((field, index) => (
+                    <div key={field.id} className="flex space-x-2 mt-2 w-full">
+                      <div className="flex flex-col">
+                        <Input
+                          {...form.register(`points.${index}.0` as const, { valueAsNumber: true })}
+                          placeholder="Latitud"
+                        />
+                        <FormMessage>
+                          {form.formState.errors.coordinates?.[index]?.[0]?.message}
+                        </FormMessage>
+                      </div>
+                      <div className="flex flex-col">
+                        <Input
+                          {...form.register(`points.${index}.1` as const, { valueAsNumber: true })}
+                          placeholder="Longitud"
+                        />
+                        <FormMessage>
+                          {form.formState.errors.coordinates?.[index]?.[1]?.message}
+                        </FormMessage>
+                      </div>
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => removePoint(index)}
+                        onClick={() => removeCoordinate(index)}
                       >
                         Eliminar
                       </Button>
                     </div>
                   ))}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => appendPoint([0, 0])}
-                    className="mt-2"
-                  >
-                    Agregar locaci&oacute;n
-                  </Button>
+                  <FormMessage>{form.formState.errors.coordinates?.root?.message}</FormMessage>
                 </div>
 
-                <div>
-                  <FormLabel>Sugerencias de puntos</FormLabel>
+                <div className="flex flex-col space-y-2">
+                  <div className="flex justify-between items-center">
+                    <FormLabel>Sugerencias de puntos</FormLabel>
+                    <ButtonTitle
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      onClick={() => appendHint([[""]] as any)}
+                      className="hover:bg-green-300"
+                      title="Agregar punto"
+                    >
+                      <Plus />
+                    </ButtonTitle>
+                  </div>
                   {hintFields.map((field, index) => (
                     <div key={field.id} className="flex items-center space-x-2 mt-2">
                       <Input {...form.register(`point_hints.${index}`)} placeholder="Sugerencia" />
@@ -181,15 +244,6 @@ export function RouteForm() {
                       </Button>
                     </div>
                   ))}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => appendHint([0, 0])}
-                    className="mt-2"
-                  >
-                    Agregar sugerencia
-                  </Button>
                 </div>
               </TabsContent>
 
@@ -334,7 +388,13 @@ export function RouteForm() {
                 />
               </TabsContent>
 
-              <DialogFooter>
+              <DialogFooter className="mt-2 flex !justify-between items-center ">
+                {/* TODO: add checkbox by resetting form */}
+                <div className="flex items-center space-x-2">
+                  <Checkbox checked={reset} onCheckedChange={() => setReset((prev) => !prev)} />
+                  <Label>Reiniciar al generar</Label>
+                </div>
+
                 <Button type="submit" disabled={form.formState.isSubmitting}>
                   {form.formState.isSubmitting ? (
                     <>
@@ -342,7 +402,7 @@ export function RouteForm() {
                       Cargando...
                     </>
                   ) : (
-                    "Ingresar"
+                    "Generar ruta"
                   )}
                 </Button>
               </DialogFooter>

@@ -50,7 +50,11 @@ export default function Map({ isMarking }: MapProps) {
   const routePoints = useMapStore((state) => state.routePoints);
 
   return (
-    <MapContainer center={[-17.392352, -66.159042]} zoom={13} className="relative w-full h-full">
+    <MapContainer
+      center={[-17.392352, -66.159042]}
+      zoom={13}
+      className="relative w-full h-full rounded-lg border-spacing-1 border-teal-900 border-2"
+    >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

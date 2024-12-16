@@ -35,17 +35,17 @@ type useEffectAsyncProps<T, D = unknown> = {
  *
  * @param asyncFunction Petición de axios que se desea ejecutar
  * @param successFunction Función que se ejecuta cuando se resuelve la petición, recibe como parámetro los datos obtenidos
- * @param errorFunction Función que se ejecuta cuando se produce un error, recibe como parámetro el error
- * @param returnFunction Función que se ejecuta cuando el componente se desmonta o si cambian las dependencias
- * @param deps Array de dependencias que se pasa al useEffect
+ * @param errorFunction (optional) Función que se ejecuta cuando se produce un error, recibe como parámetro el error
+ * @param returnFunction (optional) Función que se ejecuta cuando el componente se desmonta o si cambian las dependencias
+ * @param deps (optional) Array de dependencias que se pasa al useEffect
  */
-export const useEffectAsync = <T, D = unknown>({
+export const useEffectAsync = <TResponse, TRequest = unknown>({
   asyncFunction,
   successFunction,
   errorFunction = () => {},
   returnFunction = () => {},
   deps = [],
-}: useEffectAsyncProps<T, D>) => {
+}: useEffectAsyncProps<TResponse, TRequest>) => {
   useEffect(() => {
     let isActive = true;
     asyncFunction()

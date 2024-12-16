@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { RouteForm } from "@/components/map/route-form";
@@ -18,6 +19,7 @@ interface ControlPanelProps {
 
 export function ControlPanel({ isMarking, toggleMarking }: ControlPanelProps) {
   const { points, clearPoints, deletePoint } = useMapStore();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleDownload = () => {
     const json = JSON.stringify(points, null, 2);
@@ -74,7 +76,14 @@ export function ControlPanel({ isMarking, toggleMarking }: ControlPanelProps) {
         >
           <Download />
         </ButtonTitle>
-        <RouteForm />
+        <ButtonTitle
+          onClick={() => setIsOpen((prev) => !prev)}
+          variant="default"
+          size={"icon"}
+          title="Generar ruta"
+        >
+          <Plus />
+        </ButtonTitle>
       </div>
       <ScrollArea className="h-[300px] mt-4">
         <h3 className="font-bold mb-2">Puntos Marcados:</h3>
@@ -105,6 +114,7 @@ export function ControlPanel({ isMarking, toggleMarking }: ControlPanelProps) {
           </ul>
         )}
       </ScrollArea>
+      <RouteForm isOpen={isOpen} toggle={() => setIsOpen((prev) => !prev)} points={points} />
     </div>
   );
 }

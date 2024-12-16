@@ -1,8 +1,8 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { TypeWithKey } from ".";
 
-export interface AxiosCall<T = unknown, D = undefined> {
-  call: Promise<AxiosResponse<T, D> | AxiosError<T, D>>;
+export interface AxiosCall<TResponse = unknown, TRequest = undefined> {
+  call: Promise<AxiosResponse<TResponse, TRequest> | AxiosError<TResponse, TRequest>>;
   controller: AbortController;
 }
 

@@ -8,9 +8,10 @@ export async function POST(req: NextRequest) {
     const query = new URLSearchParams({ key: process.env.NEXT_PUBLIC_GRAPHHOPPER_KEY ?? "-" });
     const response = await axios.post(
       `https://graphhopper.com/api/1/route?${query}`,
-      { ...data, ...configure },
+      { ...data, ...configure, points: [...data.points, ...data.coordinates] },
       { headers: { "Content-Type": "application/json" } }
     );
+    if (response.data.message) throw new Error(response.data.message);
     return NextResponse.json({ success: true, result: response.data.paths }, { status: 201 });
   } catch (error) {
     if (error instanceof Error)

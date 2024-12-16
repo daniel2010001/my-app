@@ -48,15 +48,34 @@ export const Details = {
 } as const;
 export type Detail = keyof typeof Details;
 
-export const routeSchema = z.object({
-  vehicle: z.enum(Object.keys(Cars) as [Car]),
-  points: z.array(z.tuple([z.number(), z.number()])).min(2, "Se requieren al menos 2 puntos"),
-  point_hints: z.array(z.string()),
-  snap_preventions: z.array(z.enum(Object.keys(Snappings) as [Snapping])),
-  details: z.array(z.enum(Object.keys(Details) as [Detail])),
-  optimize: z.boolean().default(false),
-  instructions: z.boolean(),
-});
+export const routeSchema = z
+  .object({
+    vehicle: z.enum(Object.keys(Cars) as [Car]),
+    points: z.array(z.tuple([z.number(), z.number()])),
+    coordinates: z.array(
+      z.tuple([
+        z
+          .number({ invalid_type_error: "Latitud no válida" })
+          .min(-90)
+          .max(90)
+          .refine((value) => value !== 0, { message: "El valor no puede ser 0" }),
+        z
+          .number({ invalid_type_error: "Longitud no válida" })
+          .min(-180)
+          .max(180)
+          .refine((value) => value !== 0, { message: "El valor no puede ser 0" }),
+      ])
+    ),
+    point_hints: z.array(z.string()),
+    snap_preventions: z.array(z.enum(Object.keys(Snappings) as [Snapping])),
+    details: z.array(z.enum(Object.keys(Details) as [Detail])),
+    optimize: z.boolean().default(false),
+    instructions: z.boolean(),
+  })
+  .refine((data) => data.points.length + data.coordinates.length > 1, {
+    message: "Se requieren al menos 2 puntos",
+    path: ["points"],
+  });
 export type RouteFormData = z.infer<typeof routeSchema>;
 
 export interface Instruction {

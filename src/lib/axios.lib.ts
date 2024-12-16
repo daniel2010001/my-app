@@ -37,13 +37,16 @@ function loadAbort(): AbortController {
  * @returns Resultado de la petición
  * @throws Error de la petición
  */
-async function loadAbortable<T = unknown, D = undefined>({ call, controller }: AxiosCall<T, D>) {
-  let value: Awaited<AxiosCall<T, D>["call"]>;
+async function loadAbortable<TResponse = unknown, TRequest = undefined>({
+  call,
+  controller,
+}: AxiosCall<TResponse, TRequest>) {
+  let value: Awaited<AxiosCall<TResponse, TRequest>["call"]>;
   try {
     value = await call;
     controller?.abort();
   } catch (e) {
-    if (isAxiosError<T, D>(e)) value = e;
+    if (isAxiosError<TResponse, TRequest>(e)) value = e;
     else return;
   }
   return value;
@@ -51,20 +54,26 @@ async function loadAbortable<T = unknown, D = undefined>({ call, controller }: A
 
 /**
  * Función para crear una llamada a la API
+ * @param TResponse Tipo de la respuesta. Con esto se puede tipar el data del response.
+ * @param TRequest Tipo de del data que se lo para, si es un get no es necesario mandarlo, pero sí es necesario indicar el data como 'undefined' para pasar el config
  * @param method Método de la petición
  * @param url URL de la petición
  * @param data Datos de la petición
  * @param config Configuración de la petición
  * @returns Instancia para ser utilizada en "loadAbortable"
  */
-function createAxiosCall<T = unknown, D = undefined>(
+function createAxiosCall<TResponse = unknown, TRequest = undefined>(
   method: Method,
   url: string,
-  data?: D,
-  config?: AxiosRequestConfig<D>
-): AxiosCall<T, D> | never {
+  data?: TRequest,
+  config?: AxiosRequestConfig<TRequest>
+): AxiosCall<TResponse, TRequest> | never {
   const controller = loadAbort();
-  const call = axiosInstance.request<T, Awaited<AxiosCall<T, D>["call"]>, D>({
+  const call = axiosInstance.request<
+    TResponse,
+    Awaited<AxiosCall<TResponse, TRequest>["call"]>,
+    TRequest
+  >({
     method,
     url,
     data,
