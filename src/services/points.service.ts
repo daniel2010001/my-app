@@ -1,4 +1,4 @@
-import { PointResponse, PointRequest } from "@/models";
+import { PointResponse, PointRequest, Route } from "@/models";
 import { createAxiosCall } from "@/lib";
 
 export const createPoint = (data: PointRequest) =>
@@ -13,3 +13,6 @@ export const removePoint = (id: string) =>
   createAxiosCall<PointResponse>("DELETE", `/api/points/${id}`);
 
 export const removeAllPoints = () => createAxiosCall<PointResponse[]>("DELETE", "/api/points/all");
+
+export const getRoute = (data: Route) =>
+  createAxiosCall<unknown, Route>("POST", "/api/tracert", data);

@@ -2,6 +2,7 @@
 
 import { toast } from "sonner";
 
+import { RouteForm } from "@/components/map/route-form";
 import { ButtonTitle } from "@/components/ui/button-title";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { loadAbortable } from "@/lib";
@@ -73,6 +74,7 @@ export function ControlPanel({ isMarking, toggleMarking }: ControlPanelProps) {
         >
           <Download />
         </ButtonTitle>
+        <RouteForm />
       </div>
       <ScrollArea className="h-[300px] mt-4">
         <h3 className="font-bold mb-2">Puntos Marcados:</h3>
