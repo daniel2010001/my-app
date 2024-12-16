@@ -1,15 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
-
 import axios from "axios";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
+    const configure = { locate: "es", optimize: true, instructions: true };
     const query = new URLSearchParams({ key: process.env.NEXT_PUBLIC_GRAPHHOPPER_KEY ?? "-" });
-    const response = await axios.post(`https://graphhopper.com/api/1/route?${query}`, data, {
-      headers: { "Content-Type": "application/json" },
-    });
-    return NextResponse.json({ success: true, result: response.data }, { status: 201 });
+    const response = await axios.post(
+      `https://graphhopper.com/api/1/route?${query}`,
+      { ...data, ...configure },
+      { headers: { "Content-Type": "application/json" } }
+    );
+    return NextResponse.json({ success: true, result: response.data.paths }, { status: 201 });
   } catch (error) {
     if (error instanceof Error)
       return NextResponse.json(

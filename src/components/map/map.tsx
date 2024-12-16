@@ -2,7 +2,7 @@
 
 import L from "leaflet";
 import { useState } from "react";
-import { MapContainer, Marker, TileLayer, useMapEvents } from "react-leaflet";
+import { MapContainer, Marker, Polyline, TileLayer, useMapEvents } from "react-leaflet";
 
 import { PointFormModal } from "./point-form";
 
@@ -47,6 +47,8 @@ interface MapProps {
 
 export default function Map({ isMarking }: MapProps) {
   const points = useMapStore((state) => state.points);
+  const routePoints = useMapStore((state) => state.routePoints);
+
   return (
     <MapContainer center={[-17.392352, -66.159042]} zoom={13} className="relative w-full h-full">
       <TileLayer
@@ -54,6 +56,7 @@ export default function Map({ isMarking }: MapProps) {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
       <ClickHandler isMarking={isMarking} />
+      {routePoints.length > 0 && <Polyline positions={routePoints} color="blue" />}
       {points.map((punto, index) => (
         <Marker key={index} position={[punto.lat, punto.lng]} title={punto.name} />
       ))}

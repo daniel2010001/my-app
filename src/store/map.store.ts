@@ -23,6 +23,8 @@ const __mapStoreMiddleware = (
 export const useMapStore = create<MapStore>()(
   __mapStoreMiddleware((set) => ({
     points: [],
+    routePoints: [],
+    setRoutePoints: (routePoints) => set(() => ({ routePoints })),
     addPoint: (point) => set((state) => ({ points: state.points.concat(point) })),
     deletePoint: (id) =>
       set((state) => ({ points: state.points.filter((point) => point.id !== id) })),
