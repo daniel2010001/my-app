@@ -86,7 +86,7 @@ model Recoleccion {
   id_vehiculo   Int
   centroAcopio  CentroAcopio @relation(fields: [id_centro], references: [id])
   id_centro     Int
-  fecha         DateTime @db.Date
+  fecha         DateTime @db.Date @default(now())
   estado        EstadoRecoleccion
 }
 
@@ -100,7 +100,7 @@ model Incidencia {
   id             Int      @id @default(autoincrement())
   parcela        Parcela  @relation(fields: [id_parcela], references: [id])
   id_parcela     Int
-  fecha_incidencia DateTime @db.Date
+  fecha_incidencia DateTime? @db.Date @default(now())
   tipo_incidencia String
   descripcion    String
   impacto_kg     Int?
