@@ -39,7 +39,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { loadAbortable } from "@/lib";
 import {
-  Cars,
+  CarsType,
   Detail,
   Details,
   Point,
@@ -147,7 +147,7 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {Object.entries(Cars).map(([value, label]) => (
+                          {Object.entries(CarsType).map(([value, label]) => (
                             <SelectItem key={value} value={value}>
                               {label}
                             </SelectItem>

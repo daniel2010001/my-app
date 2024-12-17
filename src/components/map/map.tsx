@@ -1,12 +1,12 @@
 "use client";
 
 import L from "leaflet";
-import { useState } from "react";
+import { FC, useState } from "react";
 import { MapContainer, Marker, Polyline, TileLayer, useMapEvents } from "react-leaflet";
 
-import { PointFormModal } from "./point-form";
-
 import { useMapStore } from "@/store";
+import { FormModal, FormModalContent } from "./form-modal";
+
 import "leaflet/dist/leaflet.css";
 
 L.Icon.Default.mergeOptions({
@@ -15,7 +15,12 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-function ClickHandler({ isMarking }: { isMarking: boolean }) {
+interface MapProps {
+  isMarking: boolean;
+  FormComponent: FormModal;
+}
+
+function ClickHandler({ isMarking, FormComponent }: MapProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [clickedPosition, setClickedPosition] = useState<[number, number] | null>(null);
 
@@ -28,27 +33,25 @@ function ClickHandler({ isMarking }: { isMarking: boolean }) {
     },
   });
 
+  function onClose() {
+    setIsModalOpen(false);
+    setClickedPosition(null);
+  }
+
   return clickedPosition ? (
-    <PointFormModal
-      isOpen={isModalOpen}
-      onClose={() => {
-        setIsModalOpen(false);
-        setClickedPosition(null);
-      }}
+    <FormModalContent
+      open={isModalOpen}
+      onOpenChange={onClose}
+      FormComponent={FormComponent}
       lat={clickedPosition[0]}
       lng={clickedPosition[1]}
     />
   ) : null;
 }
 
-interface MapProps {
-  isMarking: boolean;
-}
-
-export default function Map({ isMarking }: MapProps) {
+export const Map: FC<MapProps> = ({ isMarking, FormComponent }) => {
   const points = useMapStore((state) => state.points);
   const routePoints = useMapStore((state) => state.routePoints);
-
   return (
     <MapContainer
       center={[-17.392352, -66.159042]}
@@ -59,11 +62,13 @@ export default function Map({ isMarking }: MapProps) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      <ClickHandler isMarking={isMarking} />
+      <ClickHandler isMarking={isMarking} FormComponent={FormComponent} />
       {routePoints.length > 0 && <Polyline positions={routePoints} color="blue" />}
       {points.map((punto, index) => (
         <Marker key={index} position={[punto.lat, punto.lng]} title={punto.name} />
       ))}
     </MapContainer>
   );
-}
+};
+
+export default Map;
