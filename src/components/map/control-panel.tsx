@@ -5,18 +5,10 @@ import { toast } from "sonner";
 
 import { RouteForm } from "@/components/map/route-form";
 import { ButtonTitle } from "@/components/ui/button-title";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { loadAbortable } from "@/lib";
 import { removeAllPoints, removePoint } from "@/services";
 import { useMapStore } from "@/store";
-import { ParcelForm } from "./parcel-form";
 
 import { Download, Plus, Trash2, X } from "lucide-react";
 
@@ -28,7 +20,6 @@ interface ControlPanelProps {
 export function ControlPanel({ isMarking, toggleMarking }: ControlPanelProps) {
   const { points, clearPoints, deletePoint } = useMapStore();
   const [isOpen, setIsOpen] = useState(false);
-  const [open, setOpen] = useState(false);
 
   const handleDownload = () => {
     const json = JSON.stringify(points, null, 2);
@@ -65,7 +56,7 @@ export function ControlPanel({ isMarking, toggleMarking }: ControlPanelProps) {
           onClick={toggleMarking}
           variant={isMarking ? "destructive" : "default"}
           size={"icon"}
-          title={isMarking ? "Desactivar Marcador" : "Activar Marcador"}
+          title="Agregar nueva parcela"
         >
           {isMarking ? <X /> : <Plus />}
         </ButtonTitle>
@@ -90,15 +81,6 @@ export function ControlPanel({ isMarking, toggleMarking }: ControlPanelProps) {
           variant="default"
           size={"icon"}
           title="Generar ruta"
-        >
-          <Plus />
-        </ButtonTitle>
-
-        <ButtonTitle
-          onClick={() => setOpen((prev) => !prev)}
-          variant="default"
-          size={"icon"}
-          title="Agregar nueva parcela"
         >
           <Plus />
         </ButtonTitle>
@@ -133,19 +115,6 @@ export function ControlPanel({ isMarking, toggleMarking }: ControlPanelProps) {
         )}
       </ScrollArea>
       <RouteForm isOpen={isOpen} toggle={() => setIsOpen((prev) => !prev)} points={points} />
-
-      <Dialog open={open} onOpenChange={() => setOpen((prev) => !prev)}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Agregar Nueva Parcela</DialogTitle>
-            <DialogDescription>
-              Ingresa los detalles de la nueva parcela aquí. Haz clic en enviar cuando hayas
-              terminado.
-            </DialogDescription>
-          </DialogHeader>
-          <ParcelForm onSubmit={console.log} />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
