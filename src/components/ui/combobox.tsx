@@ -12,6 +12,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -23,6 +24,7 @@ interface ComboboxDemoProps {
   options: ComboboxOption[];
   placeholder?: string;
   emptyText?: string;
+  children?: React.ReactNode;
 }
 
 export function Combobox({
@@ -31,10 +33,11 @@ export function Combobox({
   onChange,
   placeholder = "Selecciona una opción",
   emptyText = "No hay opciones disponibles",
+  children,
 }: ComboboxDemoProps) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="flex w-full relative">
+    <div className="flex w-[200px] relative">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -43,14 +46,20 @@ export function Combobox({
             aria-expanded={open}
             className="w-full justify-between"
           >
-            {value ? options.find((framework) => framework.value === value)?.label : placeholder}
+            {options.find((framework) => framework.value === value)?.label ?? placeholder}
             <ChevronsUpDown className="opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="max-w-full p-0">
+        <PopoverContent className="w-[200px] p-0">
           <Command>
-            <CommandInput placeholder="Search framework..." className="h-9" />
+            <CommandInput placeholder="Buscar opción..." className="h-9" />
             <CommandList>
+              {children && (
+                <div className="flex flex-col p-2 pb-0">
+                  {children}
+                  <Separator className="my-1" />
+                </div>
+              )}
               <CommandEmpty>{emptyText}</CommandEmpty>
               <CommandGroup>
                 {options.map((framework) => (

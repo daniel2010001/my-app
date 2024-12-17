@@ -51,7 +51,7 @@ export type Detail = keyof typeof Details;
 export const routeSchema = z
   .object({
     vehicle: z.enum(Object.keys(Cars) as [Car]),
-    points: z.array(z.tuple([z.number(), z.number()])),
+    points: z.array(z.string()),
     coordinates: z.array(
       z.tuple([
         z
@@ -69,14 +69,15 @@ export const routeSchema = z
     point_hints: z.array(z.string()),
     snap_preventions: z.array(z.enum(Object.keys(Snappings) as [Snapping])),
     details: z.array(z.enum(Object.keys(Details) as [Detail])),
-    optimize: z.boolean().default(false),
-    instructions: z.boolean(),
   })
   .refine((data) => data.points.length + data.coordinates.length > 1, {
     message: "Se requieren al menos 2 puntos",
     path: ["points"],
   });
 export type RouteFormData = z.infer<typeof routeSchema>;
+export type RouteRequest = Omit<RouteFormData, "coordinates" | "points"> & {
+  points: [number, number][];
+};
 
 export interface Instruction {
   distance: number;

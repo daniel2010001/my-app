@@ -1,7 +1,14 @@
 import { decode } from "@googlemaps/polyline-codec";
 
 import { isObject } from "@/lib";
-import { Route, RouteResponse, RouteResponseKeys } from "@/models";
+import {
+  Point,
+  Route,
+  RouteFormData,
+  RouteRequest,
+  RouteResponse,
+  RouteResponseKeys,
+} from "@/models";
 
 export class RouteAdapter {
   static isRouteResponse(routeResponse: unknown): routeResponse is RouteResponse {
@@ -33,6 +40,21 @@ export class RouteAdapter {
       pointsOrder: routeResponse.points_order,
       points,
       snappedWaypoints,
+    };
+  }
+
+  static toRouteResponse(data: RouteFormData, points: Point[]): RouteRequest {
+    return {
+      details: data.details,
+      snap_preventions: data.snap_preventions,
+      vehicle: data.vehicle,
+      point_hints: data.point_hints,
+      points: [
+        ...points
+          .filter(({ id }) => data.points.includes(id))
+          .map<[number, number]>(({ lat, lng }) => [lng, lat]),
+        ...data.coordinates.map<[number, number]>(([lat, lng]) => [lng, lat]),
+      ],
     };
   }
 }

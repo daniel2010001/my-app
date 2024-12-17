@@ -36,7 +36,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { loadAbortable } from "@/lib";
 import {
@@ -52,7 +51,7 @@ import {
 import { getRoute } from "@/services";
 import { useMapStore } from "@/store";
 
-import { ChevronDown, Loader2, Plus } from "lucide-react";
+import { ChevronDown, Loader2, Plus, Trash2 } from "lucide-react";
 
 interface RouteFormProps {
   isOpen: boolean;
@@ -73,15 +72,12 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
       point_hints: [],
       snap_preventions: [],
       details: [],
-      optimize: false,
-      instructions: false,
     },
   });
-  // const {
-  //   fields: pointFields,
-  //   append: appendPoint,
-  //   remove: removePoint,
-  // } = useFieldArray({ control: form.control, name: "points" });
+  const { fields: pointsFields, remove: removePoint } = useFieldArray({
+    control: form.control,
+    name: "points" as "coordinates",
+  });
 
   const {
     fields: coordinateFields,
@@ -96,7 +92,7 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
   } = useFieldArray({ control: form.control, name: "point_hints" as "coordinates" });
 
   async function onSubmit(data: RouteFormData) {
-    const response = await loadAbortable(getRoute(data));
+    const response = await loadAbortable(getRoute(RouteAdapter.toRouteResponse(data, points)));
     if (!response || response instanceof Error) return;
     const routes = response.data.map(RouteAdapter.toRoute);
     setRoutePoints(routes.map(({ points }) => points));
@@ -113,7 +109,7 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
     const point = points.find((point) => point.id === id);
     if (!point) return;
     const formPoints = form.watch("points");
-    formPoints.push([point.lng, point.lat]);
+    formPoints.push(id);
     form.setValue("points", formPoints);
   }
 
@@ -132,7 +128,7 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
             </TabsList>
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+            <form onSubmit={form.handleSubmit(onSubmit)} autoComplete="off">
               <TabsContent value="basic" className="space-y-2">
                 <FormField
                   control={form.control}
@@ -159,35 +155,60 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
                   )}
                 />
 
-                <Combobox
-                  options={points.map(({ id, name }) => ({ value: id, label: name }))}
-                  value={
-                    form.watch("points").length > 0
-                      ? `${form.watch("points").length} seleccionados`
-                      : ""
-                  }
-                  onChange={selectPoint}
-                />
-
                 <div className="flex flex-col space-y-2">
                   <div className="flex items-center justify-between">
                     <FormLabel className="">Puntos</FormLabel>
-                    <ButtonTitle
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => appendCoordinate([[0, 0]])}
-                      className="hover:bg-green-300"
-                      title="Agregar Coordenada (lat, lng)"
+                    <Combobox
+                      options={points.map(({ id, name }) => ({ value: id, label: name }))}
+                      value={""}
+                      onChange={selectPoint}
+                      placeholder={
+                        form.watch("points").length + form.watch("coordinates").length > 0
+                          ? "Añadir otro punto"
+                          : "Selecciona un punto"
+                      }
                     >
-                      <Plus />
-                    </ButtonTitle>
+                      <ButtonTitle
+                        type="button"
+                        variant="outline"
+                        onClick={() => appendCoordinate([[0, 0]])}
+                        title="Agregar Coordenada (lat, lng)"
+                      >
+                        <Plus />
+                        Agregar Coordenadas
+                      </ButtonTitle>
+                    </Combobox>
                   </div>
+                  {pointsFields.map((field, index) => {
+                    const point = points.find((point) => point.id === form.watch("points")[index]);
+                    if (!point) return null;
+                    return (
+                      <div key={field.id} className="flex flex-row gap-2">
+                        <div className="w-full border border-border px-2 flex items-center justify-between rounded">
+                          <span className="text-md">{point.name || "Sin nombre"}</span>
+                          <small className="text-muted-foreground">
+                            Lat: {point.lat.toFixed(6)}, Lng: {point.lng.toFixed(6)}
+                          </small>
+                        </div>
+                        <ButtonTitle
+                          type="button"
+                          onClick={() => removePoint(index)}
+                          variant="outline"
+                          size={"icon"}
+                          title="Borrar punto"
+                        >
+                          <Trash2 />
+                        </ButtonTitle>
+                      </div>
+                    );
+                  })}
                   {coordinateFields.map((field, index) => (
                     <div key={field.id} className="flex space-x-2 mt-2 w-full">
                       <div className="flex flex-col">
                         <Input
-                          {...form.register(`points.${index}.0` as const, { valueAsNumber: true })}
+                          {...form.register(`coordinates.${index}.0` as const, {
+                            valueAsNumber: true,
+                          })}
                           placeholder="Latitud"
                         />
                         <FormMessage>
@@ -196,7 +217,9 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
                       </div>
                       <div className="flex flex-col">
                         <Input
-                          {...form.register(`points.${index}.1` as const, { valueAsNumber: true })}
+                          {...form.register(`coordinates.${index}.1` as const, {
+                            valueAsNumber: true,
+                          })}
                           placeholder="Longitud"
                         />
                         <FormMessage>
@@ -213,12 +236,12 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
                       </Button>
                     </div>
                   ))}
-                  <FormMessage>{form.formState.errors.coordinates?.root?.message}</FormMessage>
+                  <FormMessage>{form.formState.errors.points?.message}</FormMessage>
                 </div>
 
                 <div className="flex flex-col space-y-2">
                   <div className="flex justify-between items-center">
-                    <FormLabel>Sugerencias de puntos</FormLabel>
+                    <FormLabel>Sugerencias de ruta</FormLabel>
                     <ButtonTitle
                       type="button"
                       variant="outline"
@@ -226,7 +249,7 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       onClick={() => appendHint([[""]] as any)}
                       className="hover:bg-green-300"
-                      title="Agregar punto"
+                      title="Agregar sugerencia"
                     >
                       <Plus />
                     </ButtonTitle>
@@ -351,25 +374,7 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="optimize"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border px-4 py-2">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">Optimizar ruta</FormLabel>
-                        <FormDescription>
-                          Permite optimizar la ruta para un objetivo específico
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="instructions"
                   render={({ field }) => (
@@ -385,7 +390,7 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
                       </FormControl>
                     </FormItem>
                   )}
-                />
+                /> */}
               </TabsContent>
 
               <DialogFooter className="mt-2 flex !justify-between items-center ">
