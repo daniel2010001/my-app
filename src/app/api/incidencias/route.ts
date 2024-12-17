@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { Incidencia } from "@prisma/client";
 
 // Obtener todas las incidencias
 export async function GET() {
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
       nueva_fecha,
       estado_actual,
       observaciones,
-    } = await req.json();
+    }: Incidencia = await req.json();
     const incidencia = await prisma.incidencia.create({
       data: {
         // TODO: Cuidado con esto xd

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { Vehiculo } from "@prisma/client";
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -31,7 +32,7 @@ export async function GET(req: NextRequest, { params }: Context) {
 export async function PUT(req: NextRequest, { params }: Context) {
   const { id } = await params;
   try {
-    const { tipo, capacidad_kg, volumen_max, disponibilidad, recolecciones } =
+    const { tipo, capacidad_kg, volumen_max, disponibilidad }: Vehiculo =
       await req.json();
     const vehiculo = await prisma.vehiculo.update({
       where: { id: Number(id) },
@@ -40,7 +41,6 @@ export async function PUT(req: NextRequest, { params }: Context) {
         capacidad_kg,
         volumen_max,
         disponibilidad,
-        recolecciones,
       },
     });
     return NextResponse.json(vehiculo);

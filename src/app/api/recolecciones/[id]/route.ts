@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { Recoleccion } from "@prisma/client";
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -36,9 +37,9 @@ export async function GET(req: NextRequest, { params }: Context) {
 export async function PUT(req: NextRequest, { params }: Context) {
   const { id } = await params;
   try {
-    const { id_parcela, id_vehiculo, id_centro, fecha, estado } =
+    const { id_parcela, id_vehiculo, id_centro, fecha, estado }: Recoleccion =
       await req.json();
-    const recoleccion = await prisma.recoleccion.update({
+    const recoleccion: Recoleccion = await prisma.recoleccion.update({
       where: { id: Number(id) },
       data: {
         id_parcela,

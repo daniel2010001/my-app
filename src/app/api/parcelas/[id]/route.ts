@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { Parcela } from "@prisma/client";
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -38,9 +39,7 @@ export async function PUT(req: NextRequest, { params }: Context) {
       estado_via,
       ventana_fin,
       ventana_inicio,
-      incidencias,
-      recolecciones,
-    } = await req.json();
+    }: Parcela = await req.json();
     const parcela = await prisma.parcela.update({
       where: { id: Number(id) },
       data: {
@@ -53,8 +52,6 @@ export async function PUT(req: NextRequest, { params }: Context) {
         estado_via,
         ventana_fin,
         ventana_inicio,
-        incidencias,
-        recolecciones,
       },
     });
     return NextResponse.json(parcela);

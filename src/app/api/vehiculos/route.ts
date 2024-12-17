@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { Vehiculo } from "@prisma/client";
 
 // Obtener todos los vehículos
 export async function GET() {
@@ -20,15 +21,14 @@ export async function GET() {
 // Crear un nuevo vehículo
 export async function POST(req: NextRequest) {
   try {
-    const { tipo, capacidad_kg, volumen_max, disponibilidad, recolecciones } =
+    const { tipo, capacidad_kg, volumen_max, disponibilidad }: Vehiculo =
       await req.json();
-    const vehiculo = await prisma.vehiculo.create({
+    const vehiculo: Vehiculo = await prisma.vehiculo.create({
       data: {
         tipo,
         capacidad_kg,
         volumen_max,
         disponibilidad,
-        recolecciones,
       },
     });
     return NextResponse.json(vehiculo, { status: 201 });

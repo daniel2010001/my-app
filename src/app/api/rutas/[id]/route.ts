@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { Ruta } from "@prisma/client";
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -36,8 +37,8 @@ export async function PUT(req: NextRequest, { params }: Context) {
       distancia_km,
       tiempo_estimado,
       costo,
-    } = await req.json();
-    const ruta = await prisma.ruta.update({
+    }: Ruta = await req.json();
+    const ruta: Ruta = await prisma.ruta.update({
       where: { id: Number(id) },
       data: {
         id_origen,

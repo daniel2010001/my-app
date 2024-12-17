@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { Ruta } from "@prisma/client";
 
 // Obtener todas las rutas
 export async function GET() {
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
       distancia_km,
       tiempo_estimado,
       costo,
-    } = await req.json();
+    } : Ruta = await req.json();
     const ruta = await prisma.ruta.create({
       data: {
         id_origen,

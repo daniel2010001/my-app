@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { Recoleccion } from "@prisma/client";
 
 // Obtener todas las recolecciones
 export async function GET() {
@@ -25,9 +26,9 @@ export async function GET() {
 // Crear una nueva recolección
 export async function POST(req: NextRequest) {
   try {
-    const { id_parcela, id_vehiculo, id_centro, fecha, estado } =
+    const { id_parcela, id_vehiculo, id_centro, fecha, estado }: Recoleccion =
       await req.json();
-    const recoleccion = await prisma.recoleccion.create({
+    const recoleccion: Recoleccion = await prisma.recoleccion.create({
       data: {
         id_parcela,
         id_vehiculo,

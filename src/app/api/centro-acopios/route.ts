@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { CentroAcopio } from "@prisma/client";
 
 // Obtener todos los centros de acopio
 export async function GET() {
@@ -20,22 +21,12 @@ export async function GET() {
 // Crear un nuevo centro de acopio
 export async function POST(req: NextRequest) {
   try {
-    const {
-      nombre,
-      latitud,
-      longitud,
-      rutas_origen,
-      rutas_destino,
-      recolecciones,
-    } = await req.json();
-    const centro = await prisma.centroAcopio.create({
+    const { nombre, latitud, longitud }: CentroAcopio = await req.json();
+    const centro: CentroAcopio = await prisma.centroAcopio.create({
       data: {
         nombre,
         latitud,
         longitud,
-        rutas_origen,
-        rutas_destino,
-        recolecciones,
       },
     });
     return NextResponse.json(centro, { status: 201 });

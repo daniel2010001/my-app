@@ -13,6 +13,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum EstadoRecoleccion {
+  Pendiente
+  En_Curso
+  Completada
+}
+
+enum VariedadMaiz {
+  Blanco
+  Amarillo
+  Morado
+}
+
+enum EstadoVia {
+  // Add 'Muy buena' to the list of options
+  Muy_Buena
+  Buena
+  Regular
+  Mala
+}
+
+enum Disponibilidad {
+  Disponible
+  Mantenimiento
+  En_Ruta
+}
+
 model Parcela {
   id              Int      @id @default(autoincrement())
   nombre          String
@@ -28,19 +54,6 @@ model Parcela {
   recolecciones   Recoleccion[]
 }
 
-enum VariedadMaiz {
-  Blanco
-  Amarillo
-  Morado
-}
-
-enum EstadoVia {
-  Muy_Buena
-  Buena
-  Regular
-  Mala
-}
-
 model Vehiculo {
   id              Int      @id @default(autoincrement())
   tipo            String
@@ -48,12 +61,6 @@ model Vehiculo {
   volumen_max     Decimal  @db.Decimal(10, 2)
   disponibilidad  Disponibilidad
   recolecciones   Recoleccion[]
-}
-
-enum Disponibilidad {
-  Disponible
-  Mantenimiento
-  En_Ruta
 }
 
 model CentroAcopio {
@@ -88,12 +95,6 @@ model Recoleccion {
   id_centro     Int
   fecha         DateTime @db.Date @default(now())
   estado        EstadoRecoleccion
-}
-
-enum EstadoRecoleccion {
-  Pendiente
-  En_Curso
-  Completada
 }
 
 model Incidencia {

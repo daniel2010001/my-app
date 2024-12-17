@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { Parcela } from "@prisma/client";
 
 // Obtener todas las parcelas
 export async function GET() {
@@ -30,9 +31,7 @@ export async function POST(req: NextRequest) {
       estado_via,
       ventana_fin,
       ventana_inicio,
-      incidencias,
-      recolecciones,
-    } = await req.json();
+    }: Parcela = await req.json();
     const parcela = await prisma.parcela.create({
       data: {
         nombre,
@@ -44,8 +43,6 @@ export async function POST(req: NextRequest) {
         estado_via,
         ventana_fin,
         ventana_inicio,
-        incidencias,
-        recolecciones,
       },
     });
     return NextResponse.json(parcela, { status: 201 });

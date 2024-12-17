@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { CentroAcopioUpdateInput } from "@/types/types";
+import { CentroAcopio } from "@prisma/client";
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -31,23 +33,14 @@ export async function GET(req: NextRequest, { params }: Context) {
 export async function PUT(req: NextRequest, { params }: Context) {
   const { id } = await params;
   try {
-    const {
-      nombre,
-      latitud,
-      longitud,
-      rutas_origen,
-      rutas_destino,
-      recolecciones,
-    } = await req.json();
-    const centro = await prisma.centroAcopio.update({
+    const { nombre, latitud, longitud }: CentroAcopioUpdateInput =
+      await req.json();
+    const centro: CentroAcopio = await prisma.centroAcopio.update({
       where: { id: Number(id) },
       data: {
         nombre,
         latitud,
         longitud,
-        rutas_origen,
-        rutas_destino,
-        recolecciones,
       },
     });
     return NextResponse.json(centro);

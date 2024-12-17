@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { Incidencia } from "@prisma/client";
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -43,7 +44,7 @@ export async function PUT(req: NextRequest, { params }: Context) {
       estado_actual,
       observaciones,
     } = await req.json();
-    const incidencia = await prisma.incidencia.update({
+    const incidencia: Incidencia = await prisma.incidencia.update({
       where: { id: Number(id) },
       data: {
         id_parcela,
