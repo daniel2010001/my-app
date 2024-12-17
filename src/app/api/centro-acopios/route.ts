@@ -7,6 +7,9 @@ export async function GET() {
   try {
     const centros = await prisma.centroAcopio.findMany({
       orderBy: { id: "asc" },
+      include: {
+        recolecciones: true,
+      },
     });
     return NextResponse.json(centros);
   } catch (error) {

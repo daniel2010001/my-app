@@ -7,6 +7,9 @@ export async function GET() {
   try {
     const vehiculos = await prisma.vehiculo.findMany({
       orderBy: { id: "asc" },
+      include: {
+        recolecciones: true,
+      },
     });
     return NextResponse.json(vehiculos);
   } catch (error) {

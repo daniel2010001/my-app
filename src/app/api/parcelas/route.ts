@@ -7,6 +7,10 @@ export async function GET() {
   try {
     const parcelas = await prisma.parcela.findMany({
       orderBy: { id: "asc" },
+      include: {
+        incidencias: true,
+        recolecciones: true,
+      },
     });
     return NextResponse.json(parcelas);
   } catch (error) {

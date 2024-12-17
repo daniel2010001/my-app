@@ -11,6 +11,9 @@ export async function GET(req: NextRequest, { params }: Context) {
   try {
     const vehiculo = await prisma.vehiculo.findUnique({
       where: { id: Number(id) },
+      include: {
+        recolecciones: true,
+      },
     });
     if (!vehiculo) {
       return NextResponse.json(
