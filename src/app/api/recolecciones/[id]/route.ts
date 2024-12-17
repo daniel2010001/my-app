@@ -31,16 +31,16 @@ export async function GET(req: NextRequest, { params }: Context) {
 export async function PUT(req: NextRequest, { params }: Context) {
   const { id } = await params;
   try {
-    const { id_parcela, fecha, estado, id_vehiculo, id_centro } =
+    const { id_parcela, id_vehiculo, id_centro, fecha, estado } =
       await req.json();
     const recoleccion = await prisma.recoleccion.update({
       where: { id: Number(id) },
       data: {
         id_parcela,
-        fecha,
-        estado,
         id_vehiculo,
         id_centro,
+        fecha,
+        estado,
       },
     });
     return NextResponse.json(recoleccion);

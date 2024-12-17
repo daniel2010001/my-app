@@ -10,26 +10,33 @@ export async function GET() {
     return NextResponse.json(recolecciones);
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Error fetching recolecciones" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error fetching recolecciones" },
+      { status: 500 }
+    );
   }
 }
 
 // Crear una nueva recolección
 export async function POST(req: NextRequest) {
   try {
-    const { id_parcela, fecha, estado, id_vehiculo, id_centro } = await req.json();
+    const { id_parcela, id_vehiculo, id_centro, fecha, estado } =
+      await req.json();
     const recoleccion = await prisma.recoleccion.create({
       data: {
         id_parcela,
-        fecha,
-        estado,
         id_vehiculo,
         id_centro,
+        fecha,
+        estado,
       },
     });
     return NextResponse.json(recoleccion, { status: 201 });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Error creating recoleccion" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error creating recoleccion" },
+      { status: 500 }
+    );
   }
 }
