@@ -1,11 +1,11 @@
 import { z } from "zod";
 
-export const Cars = {
+export const CarsType = {
   small_truck: "Camioneta",
   truck: "Camión",
   car: "Coche",
 } as const;
-export type Car = keyof typeof Cars;
+export type CarType = keyof typeof CarsType;
 
 export const Snappings = {
   motorway: "Autopista",
@@ -50,7 +50,7 @@ export type Detail = keyof typeof Details;
 
 export const routeSchema = z
   .object({
-    vehicle: z.enum(Object.keys(Cars) as [Car]),
+    vehicle: z.enum(Object.keys(CarsType) as [CarType]),
     points: z.array(z.string()),
     coordinates: z.array(
       z.tuple([
