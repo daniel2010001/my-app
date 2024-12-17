@@ -128,8 +128,12 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
             </TabsList>
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} autoComplete="off">
-              <TabsContent value="basic" className="space-y-2">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              autoComplete="off"
+              className="min-h-64 flex flex-col"
+            >
+              <TabsContent value="basic" className="space-y-2 flex-grow">
                 <FormField
                   control={form.control}
                   name="vehicle"
@@ -243,7 +247,7 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
                 </div>
               </TabsContent>
 
-              <TabsContent value="advanced" className="space-y-2">
+              <TabsContent value="advanced" className="space-y-2 flex-grow">
                 <div className="flex flex-col space-y-2">
                   <div className="flex justify-between items-center">
                     <FormLabel className="h-full flex flex-col gap-2">
@@ -381,24 +385,6 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
                     </FormItem>
                   )}
                 />
-
-                {/* <FormField
-                  control={form.control}
-                  name="instructions"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border px-4 py-2">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">Incluir instrucciones</FormLabel>
-                        <FormDescription>
-                          Incluye instrucciones detalladas para la ruta
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                /> */}
               </TabsContent>
 
               <DialogFooter className="mt-2 flex !justify-between items-center ">

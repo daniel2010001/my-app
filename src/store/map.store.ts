@@ -14,8 +14,8 @@ const __mapStoreMiddleware = (
     onRehydrateStorage: () => async (state) => {
       if (!state) return state;
       const response = await loadAbortable(getPoints());
-      if (response && !(response instanceof Error))
-        state.points = response.data.map(PointsAdapter.toPoint);
+      if (!response || response instanceof Error) state.points = [];
+      else state.points = response.data.map(PointsAdapter.toPoint);
       return state;
     },
   });
