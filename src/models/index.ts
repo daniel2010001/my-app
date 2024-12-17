@@ -1,5 +1,4 @@
 export * from "./axios.model";
-export * from "./db.model";
 export * from "./map.model";
 export * from "./points.model";
 export * from "./response.model";
