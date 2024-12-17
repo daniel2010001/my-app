@@ -40,8 +40,6 @@ export async function POST(req: NextRequest) {
       estado_via,
       ventana_fin,
       ventana_inicio,
-      incidencias,
-      recolecciones,
     } = await req.json();
     const parcela = await prisma.parcela.create({
       data: {
@@ -54,8 +52,6 @@ export async function POST(req: NextRequest) {
         estado_via,
         ventana_fin,
         ventana_inicio,
-        incidencias,
-        recolecciones,
       },
     });
     return NextResponse.json({ success: true, result: parcela }, { status: 201 });
