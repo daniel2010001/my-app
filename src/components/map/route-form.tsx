@@ -134,11 +134,11 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
                   control={form.control}
                   name="vehicle"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex justify-between items-center">
                       <FormLabel>Vehículo</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="w-[200px]">
                             <SelectValue placeholder="Selecciona un vehículo" />
                           </SelectTrigger>
                         </FormControl>
@@ -173,7 +173,8 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
                       <ButtonTitle
                         type="button"
                         variant="outline"
-                        onClick={() => appendCoordinate([[0, 0]])}
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        onClick={() => appendCoordinate([[undefined, undefined]] as any)}
                         title="Agregar Coordenada (lat, lng)"
                       >
                         <Plus />
@@ -231,26 +232,32 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
                       <Button
                         type="button"
                         variant="outline"
-                        size="sm"
+                        size="icon"
                         onClick={() => removeCoordinate(index)}
                       >
-                        Eliminar
+                        <Trash2 />
                       </Button>
                     </div>
                   ))}
                   <FormMessage>{form.formState.errors.points?.message}</FormMessage>
                 </div>
+              </TabsContent>
 
+              <TabsContent value="advanced" className="space-y-2">
                 <div className="flex flex-col space-y-2">
                   <div className="flex justify-between items-center">
-                    <FormLabel>Sugerencias de ruta</FormLabel>
+                    <FormLabel className="h-full flex flex-col gap-2">
+                      Sugerencias de ruta
+                      <FormDescription>
+                        Agregar sugerencias de ruta para el punto seleccionado.
+                      </FormDescription>
+                    </FormLabel>
                     <ButtonTitle
                       type="button"
                       variant="outline"
                       size="icon"
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      onClick={() => appendHint([[""]] as any)}
-                      className="hover:bg-green-300"
+                      onClick={() => appendHint([""] as any)}
                       title="Agregar sugerencia"
                     >
                       <Plus />
@@ -262,27 +269,26 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
                       <Button
                         type="button"
                         variant="outline"
-                        size="sm"
+                        size="icon"
                         onClick={() => removeHint(index)}
                       >
-                        Eliminar
+                        <Trash2 />
                       </Button>
                     </div>
                   ))}
+                  <FormMessage />
                 </div>
-              </TabsContent>
 
-              <TabsContent value="advanced" className="space-y-2">
                 <FormField
                   control={form.control}
                   name="snap_preventions"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col">
+                    <FormItem className="flex flex-wrap items-center justify-between">
                       <FormLabel>Prevención de snapping</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
-                            <Button variant="outline" className="w-[200px] justify-between">
+                            <Button variant="outline" className="w-[200px] justify-between !m-0">
                               {field.value.length > 0
                                 ? `${field.value.length} seleccionados`
                                 : "Seleccionar"}
@@ -327,7 +333,7 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
                   control={form.control}
                   name="details"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col">
+                    <FormItem className="flex flex-wrap items-center justify-between">
                       <FormLabel>Detalles</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
