@@ -2,10 +2,12 @@
 
 import dynamic from "next/dynamic";
 import { useState } from "react";
-
 import { ControlPanel } from "@/components/map/control-panel";
+import RutasList from "@/components/RutasList";
 
-const MapaInteractivo = dynamic(() => import("@/components/map/map"), { ssr: false });
+const MapaInteractivo = dynamic(() => import("@/components/map/map"), {
+  ssr: false,
+});
 
 export default function Home() {
   const [isMarking, setIsMarking] = useState(false);
@@ -18,7 +20,14 @@ export default function Home() {
           <MapaInteractivo isMarking={isMarking} />
         </div>
         <div className="col-span-1 h-full bg-white z-0">
-          <ControlPanel isMarking={isMarking} toggleMarking={() => setIsMarking((prev) => !prev)} />
+          <ControlPanel
+            isMarking={isMarking}
+            toggleMarking={() => setIsMarking((prev) => !prev)}
+          />
+        </div>
+
+        <div>
+          <RutasList />
         </div>
       </div>
     </div>
