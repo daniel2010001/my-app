@@ -1,12 +1,9 @@
-import { Point, PointRequest, PointResponse } from "@/models";
+import { isObject } from "@/lib";
+import { Point, PointRequest, PointRequestKeys, PointResponse } from "@/models";
 
 export class PointsAdapter {
   static isPointRequest(data: unknown): data is PointRequest {
-    return (
-      typeof data === "object" &&
-      data !== null &&
-      ["nombre", "latitud", "longitud"].every((key) => key in data)
-    );
+    return isObject(PointRequestKeys, data);
   }
 
   static toPointRequest(point: Omit<Point, "id">): PointRequest {

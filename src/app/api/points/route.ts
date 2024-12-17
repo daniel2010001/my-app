@@ -2,12 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { PointsAdapter } from "@/adapters";
 
-export async function GET(req: NextRequest) {
-  const db = JSON.parse(req.headers.get("DataBase") || '{"points":[]}');
-  return NextResponse.json(
-    { success: true, result: db.points.map(PointsAdapter.toResponse) },
-    { status: 200 }
-  );
+export async function GET() {
+  return NextResponse.json({ success: false, error: { message: "Not found" } }, { status: 404 });
 }
 
 export async function POST(req: NextRequest) {
@@ -18,9 +14,16 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   const point = PointsAdapter.toPoint(data);
-  const db = JSON.parse(req.headers.get("DataBase") || '{"points":[]}');
   return NextResponse.json(
     { success: true, result: { ...PointsAdapter.toResponse(point) } },
-    { status: 201, headers: { DataBase: JSON.stringify({ ...db, points: [...db.points, point] }) } }
+    { status: 201 }
   );
+}
+
+export async function PUT() {
+  return NextResponse.json({ success: false, error: { message: "Not found" } }, { status: 404 });
+}
+
+export async function DELETE() {
+  return NextResponse.json({ success: false, error: { message: "Not found" } }, { status: 404 });
 }

@@ -9,7 +9,7 @@ export type Car = keyof typeof Cars;
 
 export const Snappings = {
   motorway: "Autopista",
-  trunk: "Autopista",
+  trunk: "Carretera",
   bridge: "Puente",
   ford: "Embalse",
   tunnel: "Túnel",
@@ -48,33 +48,110 @@ export const Details = {
 } as const;
 export type Detail = keyof typeof Details;
 
-export interface Route {
-  vehicle: Car;
+export const routeSchema = z
+  .object({
+    vehicle: z.enum(Object.keys(Cars) as [Car]),
+    points: z.array(z.string()),
+    coordinates: z.array(
+      z.tuple([
+        z
+          .number({ invalid_type_error: "Latitud no válida" })
+          .min(-90)
+          .max(90)
+          .refine((value) => value !== 0, { message: "El valor no puede ser 0" }),
+        z
+          .number({ invalid_type_error: "Longitud no válida" })
+          .min(-180)
+          .max(180)
+          .refine((value) => value !== 0, { message: "El valor no puede ser 0" }),
+      ])
+    ),
+    point_hints: z.array(z.string()),
+    snap_preventions: z.array(z.enum(Object.keys(Snappings) as [Snapping])),
+    details: z.array(z.enum(Object.keys(Details) as [Detail])),
+  })
+  .refine((data) => data.points.length + data.coordinates.length > 1, {
+    message: "Se requieren al menos 2 puntos",
+    path: ["points"],
+  });
+export type RouteFormData = z.infer<typeof routeSchema>;
+export type RouteRequest = Omit<RouteFormData, "coordinates" | "points"> & {
   points: [number, number][];
-  /** Arreglo de puntos que se utilizan para sugerir rutas
-   * @example ["Heroínas", "Ayacucho"] La ruta pasará por Heroínas y Ayacucho
-   */
-  point_hints: string[];
-  /** Arreglo de puntos que se utilizan para evitar rutas
-   * @example ["motorway"] La ruta no pasará por autopistas
-   * @example ["ferry"] La ruta no pasará por ferries
-   */
-  snap_preventions: Snapping[];
-  details: Detail[];
-  /** Permite optimizar la ruta para un objetivo específico
-   * @default false
-   */
-  optimize: boolean;
-  instructions: boolean;
+};
+
+export interface Instruction {
+  distance: number;
+  heading?: number;
+  sign: number;
+  interval: number[];
+  text: string;
+  time: number;
+  street_name: string;
+  last_heading?: number;
 }
 
-export const routeSchema = z.object({
-  vehicle: z.enum(Object.keys(Cars) as [Car]),
-  points: z.array(z.tuple([z.number(), z.number()])).min(2, "Se requieren al menos 2 puntos"),
-  point_hints: z.array(z.string()),
-  snap_preventions: z.array(z.enum(Object.keys(Snappings) as [Snapping])),
-  details: z.array(z.enum(Object.keys(Details) as [Detail])),
-  optimize: z.boolean().default(false),
-  instructions: z.boolean(),
-});
-export type RouteFormData = z.infer<typeof routeSchema>;
+export type Coordinates = { type: "LineString"; coordinates: [number, number] };
+export interface Points {
+  points: Coordinates[];
+  points_order: number[];
+  points_encoded: false;
+  snapped_waypoints: Coordinates[];
+}
+export interface PointsEncoded {
+  points: string;
+  points_order: number[];
+  points_encoded: true;
+  points_encoded_multiplier: number;
+  snapped_waypoints: string;
+}
+
+export type PointsResponse = Points | PointsEncoded;
+
+export const RouteResponseKeys = [
+  "distance",
+  "weight",
+  "time",
+  "transfers",
+  "bbox",
+  "instructions",
+  "legs",
+  "details",
+  "ascend",
+  "descend",
+  "points_encoded",
+  "points_encoded_multiplier",
+] as const;
+export type RouteResponse = {
+  distance: number;
+  weight: number;
+  time: number;
+  transfers: number;
+  bbox: [number, number, number, number];
+  instructions: Instruction[];
+  legs: unknown[]; // Puede ser mejor especificar el tipo si se conoce
+  details: Record<Detail, [number, number, string | null][]>;
+  ascend: number;
+  descend: number;
+} & PointsResponse;
+
+export type Route = {
+  /** Representa la distancia total de la ruta en metros */
+  distance: number;
+  /** Representa el peso total de la ruta considerando factores como distancia, tiempo y otros criterios personalizados */
+  weight: number;
+  /** Indica el tiempo total estimado para recorrer la ruta en milisegundos */
+  time: number;
+  /** Define el cuadro delimitador de la ruta
+   * @format [minLong, minLat, maxLong, maxLat]
+   */
+  bbox: [number, number, number, number];
+  instructions: Instruction[];
+  details: Record<Detail, [number, number, string | null][]>;
+  /** Representa la distancia total que se sube durante la ruta */
+  ascend: number;
+  /** Representa la distancia total que se baja durante la ruta */
+  descend: number;
+  snappedWaypoints: [number, number][];
+  points: [number, number][];
+  pointsOrder: number[];
+};

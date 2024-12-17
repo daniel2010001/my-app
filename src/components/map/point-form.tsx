@@ -63,7 +63,11 @@ export function PointFormModal({ isOpen, onClose, lat, lng }: PointFormModalProp
           <DialogTitle>Añadir nuevo punto</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form className="grid gap-4 py-4" onSubmit={form.handleSubmit(handleSubmit)}>
+          <form
+            className="grid gap-4 py-4"
+            onSubmit={form.handleSubmit(handleSubmit)}
+            autoComplete="off"
+          >
             {PointFormLayout.map(({ name, label, disabled }) => (
               <FormField
                 key={name}
