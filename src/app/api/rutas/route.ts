@@ -6,6 +6,10 @@ export async function GET() {
   try {
     const rutas = await prisma.ruta.findMany({
       orderBy: { id: "asc" },
+      include: {
+        origen: true,
+        destino: true,
+      },
     });
     return NextResponse.json(rutas);
   } catch (error) {

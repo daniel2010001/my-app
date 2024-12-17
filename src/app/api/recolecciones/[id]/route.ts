@@ -10,6 +10,11 @@ export async function GET(req: NextRequest, { params }: Context) {
   try {
     const recoleccion = await prisma.recoleccion.findUnique({
       where: { id: Number(id) },
+      include: {
+        parcela: true,
+        vehiculo: true,
+        centroAcopio: true,
+      },
     });
     if (!recoleccion) {
       return NextResponse.json(

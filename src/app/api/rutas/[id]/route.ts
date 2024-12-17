@@ -10,6 +10,10 @@ export async function GET(req: NextRequest, { params }: Context) {
   try {
     const ruta = await prisma.ruta.findUnique({
       where: { id: Number(id) },
+      include: {
+        origen: true,
+        destino: true,
+      },
     });
     if (!ruta) {
       return NextResponse.json({ error: "Ruta not found" }, { status: 404 });

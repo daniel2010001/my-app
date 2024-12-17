@@ -10,6 +10,9 @@ export async function GET(req: NextRequest, { params }: Context) {
   try {
     const incidencia = await prisma.incidencia.findUnique({
       where: { id: Number(id) },
+      include: {
+        parcela: true,
+      },
     });
     if (!incidencia) {
       return NextResponse.json(

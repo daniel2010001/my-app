@@ -6,6 +6,11 @@ export async function GET() {
   try {
     const recolecciones = await prisma.recoleccion.findMany({
       orderBy: { id: "asc" },
+      include: {
+        parcela: true,
+        vehiculo: true,
+        centroAcopio: true,
+      },
     });
     return NextResponse.json(recolecciones);
   } catch (error) {
