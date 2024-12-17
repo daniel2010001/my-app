@@ -3,24 +3,24 @@ import { decode } from "@googlemaps/polyline-codec";
 import { isObject } from "@/lib";
 import {
   Point,
-  Route,
-  RouteFormData,
-  RouteRequest,
-  RouteResponse,
-  RouteResponseKeys,
+  Trace,
+  TraceFormData,
+  TraceRequest,
+  TraceResponse,
+  TraceResponseKeys,
 } from "@/models";
 
-export class RouteAdapter {
-  static isRouteResponse(routeResponse: unknown): routeResponse is RouteResponse {
-    return isObject(RouteResponseKeys, routeResponse);
+export class TraceAdapter {
+  static isTraceResponse(routeResponse: unknown): routeResponse is TraceResponse {
+    return isObject(TraceResponseKeys, routeResponse);
   }
 
   static coordinatesConvert({ coordinates }: { coordinates: [number, number] }): [number, number] {
     return [coordinates[1], coordinates[0]];
   }
 
-  static toRoute(routeResponse: unknown): Route {
-    if (!RouteAdapter.isRouteResponse(routeResponse))
+  static toTrace(routeResponse: unknown): Trace {
+    if (!TraceAdapter.isTraceResponse(routeResponse))
       throw new Error("RouteResponse is not a valid RouteResponse");
     const points = routeResponse.points_encoded
       ? decode(routeResponse.points)
@@ -43,7 +43,7 @@ export class RouteAdapter {
     };
   }
 
-  static toRouteResponse(data: RouteFormData, points: Point[]): RouteRequest {
+  static toTraceResponse(data: TraceFormData, points: Point[]): TraceRequest {
     return {
       details: data.details,
       snap_preventions: data.snap_preventions,

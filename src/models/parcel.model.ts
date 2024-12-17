@@ -71,19 +71,19 @@ export type ParcelResponse = {
   id: number;
   nombre: string;
   variedad_maiz: Corn;
-  latitud: number;
-  longitud: number;
+  latitud: string;
+  longitud: string;
   cantidad_kg: number;
-  distancia_km: number;
+  distancia_km: string;
   estado_via: RoadCondition;
-  ventana_inicio: Date;
-  ventana_fin: Date;
+  ventana_inicio: string;
+  ventana_fin: string;
   incidencias: number[];
   recolecciones: number[];
 };
 
 export type Parcel = {
-  id: number;
+  id: string;
   name: string;
   corn: Corn;
   lat: number;
@@ -95,4 +95,11 @@ export type Parcel = {
   windowEnd: Date;
   incidents: number[];
   collections: number[];
+};
+
+export type ParcelsStore = {
+  parcels: Parcel[];
+  addParcel: (parcel: Parcel) => void;
+  deleteParcel: (id: Parcel["id"]) => void;
+  clearParcels: () => void;
 };

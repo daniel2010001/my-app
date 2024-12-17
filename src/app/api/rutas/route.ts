@@ -10,24 +10,14 @@ export async function GET() {
     return NextResponse.json(rutas);
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { error: "Error fetching rutas" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error fetching rutas" }, { status: 500 });
   }
 }
 
 // Crear una nueva ruta
 export async function POST(req: NextRequest) {
   try {
-    const {
-      id_origen,
-      id_destino,
-      texto,
-      distancia_km,
-      tiempo_estimado,
-      costo,
-    } = await req.json();
+    const { id_origen, id_destino, texto, distancia_km, tiempo_estimado, costo } = await req.json();
     const ruta = await prisma.ruta.create({
       data: {
         id_origen,

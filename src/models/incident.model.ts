@@ -1,13 +1,31 @@
 import { z } from "zod";
 
+export const IncidentType = {
+  BREACH: "Derrumbe",
+  CRASH: "Granizo",
+  DELAY: "Retraso",
+  ACCIDENT: "Accidente",
+  BLOCKAGE: "Bloqueo",
+  COLLISION: "Colisión",
+  OTHER: "Otro",
+} as const;
+export type IncidentType = keyof typeof IncidentType;
+
+export const IncidentStatus = {
+  IN_PROGRESS: "En Curso",
+  PENDING: "Pendiente",
+  COMPLETED: "Completada",
+} as const;
+export type IncidentStatus = keyof typeof IncidentStatus;
+
 export const IncidentSchema = z.object({
-  id_parcela: z.number(),
-  tipo_incidencia: z.string(),
-  descripcion: z.string(),
-  impacto_kg: z.number().optional(),
-  nueva_fecha: z.date().optional(),
-  estado_actual: z.string().optional(),
-  observaciones: z.string().optional(),
+  parcelId: z.number(),
+  type: z.enum(Object.keys(IncidentType) as [IncidentType]),
+  description: z.string(),
+  impactKg: z.number().optional(),
+  newCollectionDate: z.date().optional(),
+  status: z.enum(Object.keys(IncidentStatus) as [IncidentStatus]),
+  observations: z.string().optional(),
 });
 export type IncidentSchema = z.infer<typeof IncidentSchema>;
 
@@ -25,7 +43,7 @@ export type IncidentRequest = {
   tipo_incidencia: string;
   descripcion: string;
   impacto_kg: number | null;
-  nueva_fecha: Date | null;
+  nueva_fecha: string | null;
   estado_actual: string | null;
   observaciones: string | null;
 };

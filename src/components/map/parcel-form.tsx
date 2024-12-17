@@ -175,7 +175,7 @@ export const ParcelForm: FormModal = ({ lat, lng }) => {
         </FormItem>
 
         <DialogFooter>
-          <Button type="submit">Guardar punto</Button>
+          <Button type="submit">Guardar parcela</Button>
         </DialogFooter>
       </form>
     </Form>

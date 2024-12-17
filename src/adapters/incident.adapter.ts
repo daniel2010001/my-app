@@ -14,13 +14,13 @@ export class IncidentsAdapter {
 
   static toIncidentRequest(incident: IncidentSchema): IncidentRequest {
     return {
-      id_parcela: incident.id_parcela,
-      tipo_incidencia: incident.tipo_incidencia,
-      descripcion: incident.descripcion,
-      impacto_kg: incident.impacto_kg ?? null,
-      nueva_fecha: incident.nueva_fecha ?? null,
-      estado_actual: incident.estado_actual ?? null,
-      observaciones: incident.observaciones ?? null,
+      id_parcela: incident.parcelId,
+      tipo_incidencia: incident.type,
+      descripcion: incident.description,
+      impacto_kg: incident.impactKg ?? null,
+      nueva_fecha: incident.newCollectionDate?.toISOString() ?? null,
+      estado_actual: incident.status ?? null,
+      observaciones: incident.observations ?? null,
     };
   }
 

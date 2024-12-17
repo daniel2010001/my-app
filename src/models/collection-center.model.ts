@@ -19,3 +19,10 @@ export type CollectionCenterResponse = {
 };
 
 export type CollectionCenter = { id: number; name: string; lat: number; lng: number };
+
+export type CollectionCentersStore = {
+  collectionCenters: CollectionCenter[];
+  addCollectionCenter: (collectionCenter: CollectionCenter) => void;
+  deleteCollectionCenter: (id: CollectionCenter["id"]) => void;
+  clearCollectionCenters: () => void;
+};

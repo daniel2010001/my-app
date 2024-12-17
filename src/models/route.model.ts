@@ -1,11 +1,6 @@
 import { z } from "zod";
 
-export const CarsType = {
-  small_truck: "Camioneta",
-  truck: "Camión",
-  car: "Coche",
-} as const;
-export type CarType = keyof typeof CarsType;
+import { CarType, CarsType } from "./car.model";
 
 export const Snappings = {
   motorway: "Autopista",
@@ -48,7 +43,7 @@ export const Details = {
 } as const;
 export type Detail = keyof typeof Details;
 
-export const routeSchema = z
+export const TraceSchema = z
   .object({
     vehicle: z.enum(Object.keys(CarsType) as [CarType]),
     points: z.array(z.string()),
@@ -74,8 +69,8 @@ export const routeSchema = z
     message: "Se requieren al menos 2 puntos",
     path: ["points"],
   });
-export type RouteFormData = z.infer<typeof routeSchema>;
-export type RouteRequest = Omit<RouteFormData, "coordinates" | "points"> & {
+export type TraceFormData = z.infer<typeof TraceSchema>;
+export type TraceRequest = Omit<TraceFormData, "coordinates" | "points"> & {
   points: [number, number][];
 };
 
@@ -107,7 +102,7 @@ export interface PointsEncoded {
 
 export type PointsResponse = Points | PointsEncoded;
 
-export const RouteResponseKeys = [
+export const TraceResponseKeys = [
   "distance",
   "weight",
   "time",
@@ -121,7 +116,7 @@ export const RouteResponseKeys = [
   "points_encoded",
   "points_encoded_multiplier",
 ] as const;
-export type RouteResponse = {
+export type TraceResponse = {
   distance: number;
   weight: number;
   time: number;
@@ -134,7 +129,7 @@ export type RouteResponse = {
   descend: number;
 } & PointsResponse;
 
-export type Route = {
+export type Trace = {
   /** Representa la distancia total de la ruta en metros */
   distance: number;
   /** Representa el peso total de la ruta considerando factores como distancia, tiempo y otros criterios personalizados */

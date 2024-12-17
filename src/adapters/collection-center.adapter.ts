@@ -12,7 +12,7 @@ export class CollectionCentersAdapter {
     return isObject(CollectionCenterRequestKeys, data);
   }
 
-  static toCollectionCentersResponse(data: CollectionCentersSchema): CollectionCenterRequest {
+  static toCollectionCentersRequest(data: CollectionCentersSchema): CollectionCenterRequest {
     return { nombre: data.name, latitud: data.lat, longitud: data.lng };
   }
 
