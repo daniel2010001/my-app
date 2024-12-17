@@ -63,3 +63,5 @@ export async function DELETE(_: NextRequest, { params }: Context) {
   if (id === "all") return NextResponse.json({ success: true, result: [] }, { status: 200 });
   return NextResponse.json({ success: false, error: { message: "Not found" } }, { status: 404 });
 }
+
+
