@@ -9,7 +9,6 @@ import { toast } from "sonner";
 
 import { ResponseAdapter } from "@/adapters";
 import { AxiosCall, axiosInstance, codeMatcher } from "@/models";
-import { useDBStore } from "@/store";
 import { ComponentError } from "@/components/custom-error";
 
 /**
@@ -90,7 +89,6 @@ function createAxiosCall<TResponse = unknown, TRequest = undefined>(
  */
 const updateHeader = (request: InternalAxiosRequestConfig) => {
   // Add custom headers here
-  // request.headers["DataBase"] = useDBStore.getState().db;
   if (!request.headers["Content-Type"]) request.headers["Content-Type"] = "application/json";
   return request;
 };
@@ -108,7 +106,6 @@ axiosInstance.interceptors.response.use(
       const apiResponse = response.data;
       if (ResponseAdapter.isError(apiResponse)) throw apiResponse.error;
       response.data = ResponseAdapter.toResponse(apiResponse);
-      useDBStore.getState().setDB(response.headers["DataBase"]);
     }
     return response;
   },
