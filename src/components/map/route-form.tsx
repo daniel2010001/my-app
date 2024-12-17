@@ -159,7 +159,9 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
                   <div className="flex items-center justify-between">
                     <FormLabel className="">Puntos</FormLabel>
                     <Combobox
-                      options={points.map(({ id, name }) => ({ value: id, label: name }))}
+                      options={points
+                        .filter(({ id }) => !form.watch("points").includes(id))
+                        .map(({ id, name }) => ({ value: id, label: name }))}
                       value={""}
                       onChange={selectPoint}
                       placeholder={
