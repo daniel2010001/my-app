@@ -9,7 +9,7 @@ export type Car = keyof typeof Cars;
 
 export const Snappings = {
   motorway: "Autopista",
-  trunk: "Autopista",
+  trunk: "Carretera",
   bridge: "Puente",
   ford: "Embalse",
   tunnel: "Túnel",
