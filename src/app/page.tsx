@@ -4,6 +4,8 @@ import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
+const MapaInteractivo = dynamic(() => import("@/components/map/map"), { ssr: false });
+
 import {
   CarsAdapter,
   CollectionCentersAdapter,
@@ -57,8 +59,6 @@ import {
   useRouteStore,
 } from "@/store";
 import { RecollectionForm } from "@/components/map";
-
-const MapaInteractivo = dynamic(() => import("@/components/map/map"), { ssr: false });
 
 export default function Home() {
   const { addPoint, deletePoint } = useMapStore();
