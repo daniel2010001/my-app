@@ -22,7 +22,7 @@ export type CollectionCenter = { id: string; name: string; lat: number; lng: num
 
 export type CollectionCentersStore = {
   collectionCenters: CollectionCenter[];
-  addCollectionCenter: (collectionCenter: CollectionCenter) => void;
+  addCollectionCenter: (collectionCenter: CollectionCenter | CollectionCenter[]) => void;
   deleteCollectionCenter: (id: CollectionCenter["id"]) => void;
   clearCollectionCenters: () => void;
 };

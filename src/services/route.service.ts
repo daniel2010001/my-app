@@ -1,6 +1,8 @@
 import { createAxiosCall } from "@/lib";
 import { RouteRequest, RouteResponse } from "@/models";
 
+export const getRoutes = () => createAxiosCall<RouteResponse[]>("GET", "/api/ruta");
+
 export const createRoute = (data: RouteRequest) =>
   createAxiosCall<RouteResponse[], RouteRequest>("POST", "/api/ruta", data);
 

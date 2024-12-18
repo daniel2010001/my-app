@@ -9,12 +9,7 @@ export const Corn = {
 } as const;
 export type Corn = ValueOf<typeof Corn>;
 
-export const RoadConditions = [
-  "Muy_Buena",
-  "Buena",
-  "Regular",
-  "Mala",
-] as const;
+export const RoadConditions = ["Muy_Buena", "Buena", "Regular", "Mala"] as const;
 export const RoadCondition = {
   VERY_GOOD: "Muy_Buena",
   GOOD: "Buena",
@@ -26,15 +21,9 @@ export type RoadCondition = ValueOf<typeof RoadCondition>;
 export const ParcelSchema = z.object({
   name: z.string().min(1, { message: "El nombre es obligatorio" }),
   corn: z.enum(Corns, { message: "El tipo de maíz es obligatorio" }),
-  lat: z
-    .number()
-    .refine((value) => value !== 0, { message: "El valor no puede ser 0" }),
-  lng: z
-    .number()
-    .refine((value) => value !== 0, { message: "El valor no puede ser 0" }),
-  amountKg: z
-    .number()
-    .positive({ message: "La cantidad tiene que ser positiva" }),
+  lat: z.number().refine((value) => value !== 0, { message: "El valor no puede ser 0" }),
+  lng: z.number().refine((value) => value !== 0, { message: "El valor no puede ser 0" }),
+  amountKg: z.number().positive({ message: "La cantidad tiene que ser positiva" }),
   distanceKm: z
     .number()
     .positive({ message: "La cantidad tiene que ser positiva" })
@@ -116,7 +105,7 @@ export type Parcel = {
 
 export type ParcelsStore = {
   parcels: Parcel[];
-  addParcel: (parcel: Parcel) => void;
+  addParcel: (parcel: Parcel | Parcel[]) => void;
   deleteParcel: (id: Parcel["id"]) => void;
   clearParcels: () => void;
 };

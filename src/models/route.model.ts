@@ -64,7 +64,7 @@ export type Route = {
 
 export type RoutesStore = {
   routes: Route[];
-  addRoute: (route: Route) => void;
+  addRoute: (route: Route | Route[]) => void;
   deleteRoute: (id: Route["id"]) => void;
   clearRoutes: () => void;
 };

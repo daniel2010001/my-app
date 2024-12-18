@@ -58,10 +58,9 @@ export const Map: FC<MapProps> = ({ isMarking, FormComponent, points, lines, bou
         lines.map(({ points, id }) => (
           <Polyline key={id} positions={points} color={generateColor(id)} />
         ))}
-      {points.length > 0 &&
-        points.map((punto, index) => (
-          <Marker key={index} position={[punto.lat, punto.lng]} title={punto.name} />
-        ))}
+      {points.map((punto, index) => (
+        <Marker key={index} position={[punto.lat, punto.lng]} title={punto.name} />
+      ))}
       <CenterMapComponent bounds={bounds} />
     </MapContainer>
   );

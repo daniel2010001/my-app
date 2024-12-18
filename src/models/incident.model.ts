@@ -83,7 +83,7 @@ export type Incident = {
 
 export type IncidentsStore = {
   incidents: Incident[];
-  addIncident: (incident: Incident) => void;
+  addIncident: (incident: Incident | Incident[]) => void;
   deleteIncident: (id: Incident["id"]) => void;
   clearIncidents: () => void;
 };
