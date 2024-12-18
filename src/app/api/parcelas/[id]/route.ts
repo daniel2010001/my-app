@@ -71,13 +71,15 @@ export async function PUT(req: NextRequest, { params }: Context) {
 // Eliminar una parcela específica
 export async function DELETE(req: NextRequest, { params }: Context) {
   const { id } = await params;
+
   try {
     await prisma.parcela.delete({
       where: { id: Number(id) },
     });
-    return NextResponse.json(null, { status: 204 }); // No Content
+
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return NextResponse.json(
       { error: "Error deleting parcela" },
       { status: 500 }

@@ -83,7 +83,7 @@ model Ruta {
 
 model Recoleccion {
   id           Int               @id @default(autoincrement())
-  parcela      Parcela           @relation(fields: [id_parcela], references: [id])
+  parcela      Parcela           @relation(fields: [id_parcela], references: [id], onDelete: Cascade)
   id_parcela   Int
   vehiculo     Vehiculo          @relation(fields: [id_vehiculo], references: [id])
   id_vehiculo  Int
@@ -101,7 +101,7 @@ enum EstadoRecoleccion {
 
 model Incidencia {
   id               Int       @id @default(autoincrement())
-  parcela          Parcela   @relation(fields: [id_parcela], references: [id])
+  parcela          Parcela   @relation(fields: [id_parcela], references: [id], onDelete: Cascade)
   id_parcela       Int
   fecha_incidencia DateTime? @default(now()) @db.Date
   tipo_incidencia  String
