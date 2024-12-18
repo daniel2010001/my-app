@@ -80,3 +80,10 @@ export type Incident = {
   estado_actual: ValueOf<typeof IncidentStatus> | null;
   observaciones: string | null;
 };
+
+export type IncidentsStore = {
+  incidents: Incident[];
+  addIncident: (incident: Incident) => void;
+  deleteIncident: (id: Incident["id"]) => void;
+  clearIncidents: () => void;
+};

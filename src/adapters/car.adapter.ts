@@ -10,7 +10,7 @@ export class CarsAdapter {
     return {
       tipo: car.type,
       capacidad_kg: car.capacity,
-      volumen_max: car.volume,
+      volumen_max: car.volume.toString(),
       disponibilidad: Available[car.available],
     };
   }

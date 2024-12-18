@@ -26,7 +26,7 @@ export const CarRequestKeys = ["tipo", "capacidad_kg", "volumen_max", "disponibi
 export type CarRequest = {
   tipo: string;
   capacidad_kg: number;
-  volumen_max: number;
+  volumen_max: string;
   disponibilidad: ValueOf<typeof Available>;
 };
 
@@ -52,4 +52,11 @@ export type Car = {
   capacity: number;
   volume: number;
   available: ValueOf<typeof Available>;
+};
+
+export type CarsStore = {
+  cars: Car[];
+  addCar: (car: Car) => void;
+  deleteCar: (id: Car["id"]) => void;
+  clearCars: () => void;
 };
