@@ -40,20 +40,14 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { loadAbortable } from "@/lib";
 import { cn } from "@/lib/utils";
-import { IncidentSchema, IncidentStatus, IncidentType, Parcel } from "@/models";
+import { IncidentSchema, IncidentStatus, IncidentType } from "@/models";
 import { createIncident } from "@/services";
+import { useParcelStore } from "@/store";
 
 import { CalendarIcon, Loader2 } from "lucide-react";
 
-export function IncidentForm({
-  isOpen,
-  toggle,
-  parcels,
-}: {
-  isOpen: boolean;
-  toggle: () => void;
-  parcels: Parcel[];
-}) {
+export function IncidentForm({ isOpen, toggle }: { isOpen: boolean; toggle: () => void }) {
+  const { parcels } = useParcelStore();
   const [reset, setReset] = useState(true);
   const form = useForm<IncidentSchema>({
     resolver: zodResolver(IncidentSchema),
@@ -79,6 +73,7 @@ export function IncidentForm({
     toggle();
     if (reset) form.reset();
   }
+  console.log("render incident form");
   return (
     <Dialog open={isOpen} onOpenChange={onReset}>
       <DialogContent className="sm:max-w-[500px]">

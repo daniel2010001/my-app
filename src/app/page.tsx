@@ -235,11 +235,7 @@ export default function Home() {
           <ControlPanel isMarking={isMarking} toggleMarking={toggleMarking} />
         </div>
         <CarForm isOpen={openCarForm} toggle={() => setCarForm((prev) => !prev)} />
-        <IncidentForm
-          isOpen={openIncidentForm}
-          toggle={() => setIncidentForm((prev) => !prev)}
-          parcels={parcels}
-        />
+        <IncidentForm isOpen={openIncidentForm} toggle={() => setIncidentForm((prev) => !prev)} />
         <TraceForm
           isOpen={openTraceForm}
           toggle={() => setTraceForm((prev) => !prev)}
