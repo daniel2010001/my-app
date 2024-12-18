@@ -6,8 +6,10 @@ export interface MapStore {
   addPoint: (point: Point) => void;
   deletePoint: (id: Point["id"]) => void;
   clearPoints: () => void;
-  routes: Line[];
-  addRoute: (route: Line[]) => void;
-  deleteRoute: (id: Line["id"]) => void;
-  clearRoutes: () => void;
+  lines: Line[];
+  addLine: (route: Line[]) => void;
+  deleteLine: (id: Line["id"]) => void;
+  clearLines: () => void;
+  bounds: [[number, number], [number, number]];
+  setBounds: (bbox: [number, number, number, number]) => void;
 }

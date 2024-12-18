@@ -30,15 +30,27 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { IncidentSchema, IncidentStatus, IncidentType } from "@/models";
+import { IncidentSchema, IncidentStatus, IncidentType, Parcel } from "@/models";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
+import { IncidentsAdapter } from "@/adapters";
+import { loadAbortable } from "@/lib";
+import { createIncident } from "@/services";
+import { toast } from "sonner";
 
-export function IncidentForm({ isOpen, toggle }: { isOpen: boolean; toggle: () => void }) {
+export function IncidentForm({
+  isOpen,
+  toggle,
+  parcels,
+}: {
+  isOpen: boolean;
+  toggle: () => void;
+  parcels: Parcel[];
+}) {
   const form = useForm<IncidentSchema>({
     resolver: zodResolver(IncidentSchema),
     defaultValues: {
-      parcelId: 0,
+      parcelId: "",
       type: "BREACH",
       status: "PENDING",
       description: "",
@@ -48,8 +60,12 @@ export function IncidentForm({ isOpen, toggle }: { isOpen: boolean; toggle: () =
     },
   });
 
-  function onSubmit(values: IncidentSchema) {
-    console.log(values);
+  async function onSubmit(values: IncidentSchema) {
+    const response = await loadAbortable(
+      createIncident(IncidentsAdapter.toIncidentRequest(values))
+    );
+    if (!response || response instanceof Error) return toast.error("Error al guardar incidente");
+    toast.success("Incidente guardado correctamente");
   }
 
   return (
@@ -69,19 +85,32 @@ export function IncidentForm({ isOpen, toggle }: { isOpen: boolean; toggle: () =
               name="parcelId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>ID de Paquete</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      {...field}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                    />
-                  </FormControl>
-                  <FormDescription>Ingrese el ID del paquete afectado</FormDescription>
+                  <FormLabel>Parcela afectada</FormLabel>
+                  <FormDescription></FormDescription>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona una parcela" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {(parcels?.length > 0 &&
+                        parcels.map((parcel) => (
+                          <SelectItem key={parcel.id} value={parcel.id}>
+                            {parcel.name}
+                          </SelectItem>
+                        ))) || (
+                        <SelectItem value="0" disabled>
+                          No hay parcelas
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="type"

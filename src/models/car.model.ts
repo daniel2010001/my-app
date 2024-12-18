@@ -47,7 +47,7 @@ export type CarResponse = {
 };
 
 export type Car = {
-  id: number;
+  id: string;
   type: string;
   capacity: number;
   volume: number;

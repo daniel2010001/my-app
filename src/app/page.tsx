@@ -24,7 +24,7 @@ import { useMapStore, useParcelStore } from "@/store";
 const MapaInteractivo = dynamic(() => import("@/components/map/map"), { ssr: false });
 
 export default function Home() {
-  const { points, routes } = useMapStore();
+  const { points, lines: routes, bounds } = useMapStore();
   const { parcels } = useParcelStore();
   const [isMarking, setIsMarking] = useState(false);
   const [carForm, setCarForm] = useState(false);
@@ -42,6 +42,7 @@ export default function Home() {
             FormComponent={CollectionCenterForm}
             points={points}
             lines={routes}
+            bounds={bounds}
           />
         </div>
 
@@ -108,7 +109,11 @@ export default function Home() {
           <ControlPanel isMarking={isMarking} toggleMarking={() => setIsMarking((prev) => !prev)} />
         </div>
         <CarForm isOpen={carForm} toggle={() => setCarForm((prev) => !prev)} />
-        <IncidentForm isOpen={incidentForm} toggle={() => setIncidentForm((prev) => !prev)} />
+        <IncidentForm
+          isOpen={incidentForm}
+          toggle={() => setIncidentForm((prev) => !prev)}
+          parcels={parcels}
+        />
         <TraceForm
           isOpen={traceForm}
           toggle={() => setTraceForm((prev) => !prev)}

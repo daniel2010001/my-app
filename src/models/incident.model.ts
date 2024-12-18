@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ValueOf } from ".";
 
 export const IncidentType = {
   BREACH: "Derrumbe",
@@ -19,7 +20,7 @@ export const IncidentStatus = {
 export type IncidentStatus = keyof typeof IncidentStatus;
 
 export const IncidentSchema = z.object({
-  parcelId: z.number(),
+  parcelId: z.string().min(1, { message: "El ID de la parcela es obligatorio" }),
   type: z.enum(Object.keys(IncidentType) as [IncidentType]),
   description: z.string(),
   impactKg: z.number().optional(),
@@ -40,11 +41,11 @@ export const IncidentRequestKeys = [
 ] as const;
 export type IncidentRequest = {
   id_parcela: number;
-  tipo_incidencia: string;
+  tipo_incidencia: ValueOf<typeof IncidentType>;
   descripcion: string;
   impacto_kg: number | null;
   nueva_fecha: string | null;
-  estado_actual: string | null;
+  estado_actual: ValueOf<typeof IncidentStatus> | null;
   observaciones: string | null;
 };
 
@@ -61,21 +62,21 @@ export const IncidentResponseKeys = [
 export type IncidentResponse = {
   id: number;
   id_parcela: number;
-  tipo_incidencia: string;
+  tipo_incidencia: ValueOf<typeof IncidentType>;
   descripcion: string;
   impacto_kg: number | null;
   nueva_fecha: Date | null;
-  estado_actual: string | null;
+  estado_actual: ValueOf<typeof IncidentStatus> | null;
   observaciones: string | null;
 };
 
 export type Incident = {
-  id: number;
+  id: string;
   id_parcela: number;
-  tipo_incidencia: string;
+  tipo_incidencia: ValueOf<typeof IncidentType>;
   descripcion: string;
   impacto_kg: number | null;
   nueva_fecha: Date | null;
-  estado_actual: string | null;
+  estado_actual: ValueOf<typeof IncidentStatus> | null;
   observaciones: string | null;
 };

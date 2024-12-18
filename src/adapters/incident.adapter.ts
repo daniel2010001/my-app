@@ -5,6 +5,8 @@ import {
   IncidentRequestKeys,
   IncidentResponse,
   IncidentSchema,
+  IncidentStatus,
+  IncidentType,
 } from "@/models";
 
 export class IncidentsAdapter {
@@ -14,19 +16,19 @@ export class IncidentsAdapter {
 
   static toIncidentRequest(incident: IncidentSchema): IncidentRequest {
     return {
-      id_parcela: incident.parcelId,
-      tipo_incidencia: incident.type,
+      id_parcela: Number(incident.parcelId) ?? 0,
+      tipo_incidencia: IncidentType[incident.type] ?? IncidentType.OTHER,
       descripcion: incident.description,
       impacto_kg: incident.impactKg ?? null,
       nueva_fecha: incident.newCollectionDate?.toISOString() ?? null,
-      estado_actual: incident.status ?? null,
+      estado_actual: IncidentStatus[incident.status] ?? null,
       observaciones: incident.observations ?? null,
     };
   }
 
   static toIncident(incident: IncidentResponse): Incident {
     return {
-      id: incident.id,
+      id: incident.id.toString(),
       id_parcela: incident.id_parcela,
       tipo_incidencia: incident.tipo_incidencia,
       descripcion: incident.descripcion,

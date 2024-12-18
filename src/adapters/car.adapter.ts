@@ -17,7 +17,7 @@ export class CarsAdapter {
 
   static toCar(car: CarResponse): Car {
     return {
-      id: car.id,
+      id: car.id.toString(),
       type: car.tipo,
       capacity: car.capacidad_kg,
       volume: Number(car.volumen_max),

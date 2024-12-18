@@ -61,7 +61,7 @@ interface RouteFormProps {
 
 export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
   const [reset, setReset] = useState(true);
-  const addRoute = useMapStore((state) => state.addRoute);
+  const { addLine, setBounds } = useMapStore();
 
   const form = useForm<TraceFormData>({
     resolver: zodResolver(TraceSchema),
@@ -94,9 +94,23 @@ export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
   async function onSubmit(data: TraceFormData) {
     const response = await loadAbortable(traceRoute(TraceAdapter.toTraceResponse(data, parcels)));
     if (!response || response instanceof Error) return;
-    const trace = response.data.map(TraceAdapter.toTrace);
+    const traces = response.data.map(TraceAdapter.toTrace);
     const idLine = Date.now().toString();
-    addRoute(trace.map(({ points }, index) => ({ points, id: idLine + index })));
+    addLine(traces.map(({ points }, index) => ({ points, id: idLine + index })));
+    const bbox: [number, number, number, number] = traces
+      .map(({ bbox }) => bbox)
+      .reduce(
+        (acc, curr) => {
+          return [
+            Math.min(acc[0], curr[0]),
+            Math.min(acc[1], curr[1]),
+            Math.max(acc[2], curr[2]),
+            Math.max(acc[3], curr[3]),
+          ];
+        },
+        [Infinity, Infinity, -Infinity, -Infinity]
+      );
+    setBounds(bbox);
     if (reset) form.reset();
     toggle();
   }

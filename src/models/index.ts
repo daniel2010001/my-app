@@ -6,5 +6,6 @@ export * from "./map.model";
 export * from "./parcel.model";
 export * from "./response.model";
 export * from "./route.model";
+export * from "./trace.model";
 export type TypeWithKey<T> = { [key: string]: T };
 export type ValueOf<T> = T[keyof T];
