@@ -11,7 +11,7 @@ import {
 } from "@/models";
 
 export class TraceAdapter {
-  static isTraceResponse(routeResponse: unknown): routeResponse is TraceResponse {
+  static isResponse(routeResponse: unknown): routeResponse is TraceResponse {
     return isObject(TraceResponseKeys, routeResponse);
   }
 
@@ -20,7 +20,7 @@ export class TraceAdapter {
   }
 
   static toTrace(routeResponse: unknown): Trace {
-    if (!TraceAdapter.isTraceResponse(routeResponse))
+    if (!TraceAdapter.isResponse(routeResponse))
       throw new Error("RouteResponse is not a valid RouteResponse");
     const points = routeResponse.points_encoded
       ? decode(routeResponse.points)
@@ -43,7 +43,7 @@ export class TraceAdapter {
     };
   }
 
-  static toTraceResponse(data: TraceFormData, points: Point[]): TraceRequest {
+  static toResponse(data: TraceFormData, points: Point[]): TraceRequest {
     return {
       details: data.details,
       snap_preventions: data.snap_preventions,

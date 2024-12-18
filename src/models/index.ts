@@ -5,6 +5,7 @@ export * from "./incident.model";
 export * from "./map.model";
 export * from "./parcel.model";
 export * from "./response.model";
+export * from "./recollection.model";
 export * from "./route.model";
 export * from "./trace.model";
 export type TypeWithKey<T> = { [key: string]: T };

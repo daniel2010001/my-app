@@ -49,19 +49,19 @@ import {
   Snappings,
 } from "@/models";
 import { traceRoute } from "@/services";
-import { useMapStore } from "@/store";
+import { useMapStore, useParcelStore } from "@/store";
 
 import { ChevronDown, Loader2, Plus, Trash2 } from "lucide-react";
 
 interface RouteFormProps {
   isOpen: boolean;
   toggle: () => void;
-  parcels: Parcel[];
 }
 
-export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
+export function TraceForm({ isOpen, toggle }: RouteFormProps) {
   const [reset, setReset] = useState(true);
   const { addLine, setBounds } = useMapStore();
+  const { parcels } = useParcelStore();
 
   const form = useForm<TraceFormData>({
     resolver: zodResolver(TraceSchema),
@@ -92,7 +92,7 @@ export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
   } = useFieldArray({ control: form.control, name: "point_hints" as "coordinates" });
 
   async function onSubmit(data: TraceFormData) {
-    const response = await loadAbortable(traceRoute(TraceAdapter.toTraceResponse(data, parcels)));
+    const response = await loadAbortable(traceRoute(TraceAdapter.toResponse(data, parcels)));
     if (!response || response instanceof Error) return;
     const traces = response.data.map(TraceAdapter.toTrace);
     const idLine = Date.now().toString();

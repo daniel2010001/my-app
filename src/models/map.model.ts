@@ -1,4 +1,10 @@
-export type Point = { id: string; lat: number; lng: number; name: string };
+export type Point = {
+  id: string;
+  lat: number;
+  lng: number;
+  name: string;
+  icon: "parcel" | "collection-center";
+};
 export type Line = { id: string; points: [number, number][] };
 
 export interface MapStore {

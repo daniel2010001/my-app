@@ -9,10 +9,7 @@ export async function GET() {
       orderBy: { id: "asc" },
       include: { recolecciones: true, incidencias: true },
     });
-    return NextResponse.json(
-      { success: true, result: parcelas },
-      { status: 200 }
-    );
+    return NextResponse.json({ success: true, result: parcelas }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
@@ -27,16 +24,13 @@ export async function POST(req: NextRequest) {
   try {
     // ejemplo de cómo parsear datos de la petición
     const data = await req.json();
-    if (!ParcelsAdapter.isParcelRequest(data))
+    if (!ParcelsAdapter.isRequest(data))
       return NextResponse.json(
         { success: false, error: { message: "Error parsing parcel data" } },
         { status: 400 }
       );
-    const _parcela = await prisma.parcela.create({ data });
-    return NextResponse.json(
-      { success: true, result: _parcela },
-      { status: 201 }
-    );
+    const parcela = await prisma.parcela.create({ data });
+    return NextResponse.json({ success: true, result: parcela }, { status: 201 });
     /* const {
       nombre,
       variedad_maiz,

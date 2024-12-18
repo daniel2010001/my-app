@@ -48,7 +48,7 @@ export const ParcelForm: FormModal = ({ lat, lng }) => {
   }
 
   async function onSubmit(data: ParcelSchema) {
-    const response = await loadAbortable(createParcel(ParcelsAdapter.toParcelRequest(data)));
+    const response = await loadAbortable(createParcel(ParcelsAdapter.toRequest(data)));
     if (!response || response instanceof Error) return toast.error("Error al guardar parcela");
     toast.success("Parcela guardada correctamente");
   }

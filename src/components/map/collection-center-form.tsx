@@ -36,7 +36,7 @@ export const CollectionCenterForm: FormModal = ({ lat, lng }) => {
 
   async function onSubmit(data: PointFormSchema) {
     const response = await loadAbortable(
-      createCollectionCenter(CollectionCentersAdapter.toCollectionCentersRequest(data))
+      createCollectionCenter(CollectionCentersAdapter.toRequest(data))
     );
     if (!response || response instanceof Error) return toast.error("Error al guardar punto");
     toast.success("Punto guardado correctamente");

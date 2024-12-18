@@ -7,13 +7,14 @@ import {
   ParcelSchema,
   Point,
 } from "@/models";
+import { IncidentsAdapter, RecollectionsAdapter } from ".";
 
 export class ParcelsAdapter {
-  static isParcelRequest(data: unknown): data is ParcelRequest {
+  static isRequest(data: unknown): data is ParcelRequest {
     return isObject(ParcelRequestKeys, data);
   }
 
-  static toParcelRequest(parcel: ParcelSchema): ParcelRequest {
+  static toRequest(parcel: ParcelSchema): ParcelRequest {
     return {
       nombre: parcel.name,
       variedad_maiz: parcel.corn,
@@ -40,17 +41,18 @@ export class ParcelsAdapter {
       roadCondition: parcel.estado_via,
       windowStar: new Date(parcel.ventana_inicio),
       windowEnd: new Date(parcel.ventana_fin),
-      incidents: parcel.incidencias,
-      collections: parcel.recolecciones,
+      incidents: parcel.incidencias.map(IncidentsAdapter.toIncident),
+      collections: parcel.recolecciones.map(RecollectionsAdapter.toRecollection),
     };
   }
 
   static toPoint(parcel: ParcelResponse): Point {
     return {
-      id: parcel.id.toString(),
+      id: `parcel-${parcel.id}`,
       lat: Number(parcel.latitud),
       lng: Number(parcel.longitud),
       name: parcel.nombre,
+      icon: "parcel",
     };
   }
 }

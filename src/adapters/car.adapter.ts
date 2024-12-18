@@ -2,11 +2,11 @@ import { isObject } from "@/lib";
 import { Car, CarRequest, CarRequestKeys, CarResponse, CarSchema, Available } from "@/models";
 
 export class CarsAdapter {
-  static isCarRequest(data: unknown): data is CarRequest {
+  static isRequest(data: unknown): data is CarRequest {
     return isObject(CarRequestKeys, data);
   }
 
-  static toCarRequest(car: CarSchema): CarRequest {
+  static toRequest(car: CarSchema): CarRequest {
     return {
       tipo: car.type,
       capacidad_kg: car.capacity,
@@ -24,4 +24,13 @@ export class CarsAdapter {
       available: car.disponibilidad,
     };
   }
+
+  // static toPoint(car: CarResponse): Point {
+  //   return {
+  //     id: `car-${car.id}`,
+  //     lat: Number(car.latitud),
+  //     lng: Number(car.longitud),
+  //     name: car.tipo,
+  //   };
+  // }
 }

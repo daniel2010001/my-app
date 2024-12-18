@@ -47,7 +47,7 @@ import { useParcelStore } from "@/store";
 import { CalendarIcon, Loader2 } from "lucide-react";
 
 export function IncidentForm({ isOpen, toggle }: { isOpen: boolean; toggle: () => void }) {
-  const { parcels } = useParcelStore();
+  const parcels = useParcelStore((state) => state.parcels);
   const [reset, setReset] = useState(true);
   const form = useForm<IncidentSchema>({
     resolver: zodResolver(IncidentSchema),
@@ -63,9 +63,7 @@ export function IncidentForm({ isOpen, toggle }: { isOpen: boolean; toggle: () =
   });
 
   async function onSubmit(values: IncidentSchema) {
-    const response = await loadAbortable(
-      createIncident(IncidentsAdapter.toIncidentRequest(values))
-    );
+    const response = await loadAbortable(createIncident(IncidentsAdapter.toRequest(values)));
     if (!response || response instanceof Error) return toast.error("Error al guardar incidente");
     toast.success("Incidente guardado correctamente");
   }

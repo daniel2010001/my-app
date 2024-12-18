@@ -54,8 +54,8 @@ export type RouteResponse = {
 
 export type Route = {
   id: string;
-  idOrigen: string;
-  idDestino: string;
+  origenId: string;
+  destinoId: string;
   points: [number, number][];
   distanceKm: string;
   timeEstimated: string;

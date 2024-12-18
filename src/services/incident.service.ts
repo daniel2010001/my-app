@@ -1,19 +1,21 @@
-import { IncidentRequest, IncidentResponse } from "@/models";
 import { createAxiosCall } from "@/lib";
+import { Incident, IncidentRequest, IncidentResponse } from "@/models";
 
-export const getIncidents = () => createAxiosCall<IncidentResponse[]>("GET", "/api/incidencias");
+const __apiIncidents = "/api/incidencias";
+
+export const getIncidents = () => createAxiosCall<IncidentResponse[]>("GET", __apiIncidents);
 
 export const createIncident = (data: IncidentRequest) =>
-  createAxiosCall<IncidentResponse, IncidentRequest>("POST", "/api/incidencias", data);
+  createAxiosCall<IncidentResponse, IncidentRequest>("POST", __apiIncidents, data);
 
-export const updateIncident = (id: IncidentResponse["id"], data: IncidentRequest) =>
-  createAxiosCall<IncidentResponse, IncidentRequest>("PUT", `/api/incidencias/${id}`, data);
+export const updateIncident = (id: Incident["id"], data: IncidentRequest) =>
+  createAxiosCall<IncidentResponse, IncidentRequest>("PUT", `${__apiIncidents}/${id}`, data);
 
-export const removeIncident = (id: IncidentResponse["id"]) =>
-  createAxiosCall<IncidentResponse>("DELETE", `/api/incidencias/${id}`);
+export const removeIncident = (id: Incident["id"]) =>
+  createAxiosCall<IncidentResponse>("DELETE", `${__apiIncidents}/${id}`);
 
 export const removeAllIncidents = () =>
-  createAxiosCall<IncidentResponse[]>("DELETE", "/api/incidencias/all");
+  createAxiosCall<IncidentResponse[]>("DELETE", `${__apiIncidents}/all`);
 
-export const getIncident = (id: IncidentResponse["id"]) =>
-  createAxiosCall<IncidentResponse>("GET", `/api/incidencias/${id}`);
+export const getIncident = (id: Incident["id"]) =>
+  createAxiosCall<IncidentResponse>("GET", `${__apiIncidents}/${id}`);

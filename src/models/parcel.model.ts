@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ValueOf } from ".";
+import { Incident, IncidentResponse, Recollection, RecollectionResponse, ValueOf } from ".";
 
 export const Corns = ["Blanco", "Amarillo", "Morado"] as const;
 export const Corn = {
@@ -77,6 +77,7 @@ export const ParcelResponseKeys = [
 ] as const;
 export type ParcelResponse = {
   id: number;
+  id_centro: number;
   nombre: string;
   variedad_maiz: Corn;
   latitud: string;
@@ -86,8 +87,8 @@ export type ParcelResponse = {
   estado_via: RoadCondition;
   ventana_inicio: string;
   ventana_fin: string;
-  incidencias: number[];
-  recolecciones: number[];
+  incidencias: IncidentResponse[];
+  recolecciones: RecollectionResponse[];
 };
 
 export type Parcel = {
@@ -101,8 +102,8 @@ export type Parcel = {
   roadCondition: RoadCondition;
   windowStar: Date;
   windowEnd: Date;
-  incidents: number[];
-  collections: number[];
+  incidents: Incident[];
+  collections: Recollection[];
 };
 
 export type ParcelsStore = {

@@ -39,7 +39,7 @@ export function CarForm({ isOpen, toggle }: { isOpen: boolean; toggle: () => voi
   });
 
   async function onSubmit(values: CarSchema) {
-    const response = await loadAbortable(createCar(CarsAdapter.toCarRequest(values)));
+    const response = await loadAbortable(createCar(CarsAdapter.toRequest(values)));
     if (!response || response instanceof Error)
       return toast.error("Error al guardar centro de acopio");
     toast.success("Centro de acopio guardado correctamente");
