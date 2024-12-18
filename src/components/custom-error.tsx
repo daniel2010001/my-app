@@ -7,11 +7,11 @@ export function ComponentError<T = unknown>(props: APIResponseError<T>["error"])
       {message && <p className="">{message}</p>}
       {Object.entries<string[]>(errorObject as { [s: string]: string[] }).map(
         ([field, restrictions]) => (
-          <div key={field}>
+          <div key={`error-${field}`}>
             <h3>{field}</h3>
             <ul>
               {restrictions.map((restriction) => (
-                <li key={restriction}>{restriction}</li>
+                <li key={`restriction-${field}-${restriction}`}>{restriction}</li>
               ))}
             </ul>
           </div>

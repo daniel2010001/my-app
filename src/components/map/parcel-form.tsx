@@ -90,7 +90,7 @@ export const ParcelForm: FormModal = ({ lat, lng }) => {
                 </FormControl>
                 <SelectContent>
                   {Corns.map((corn) => (
-                    <SelectItem key={corn} value={corn}>
+                    <SelectItem key={`corn-${corn}`} value={corn}>
                       {corn}
                     </SelectItem>
                   ))}
@@ -151,7 +151,7 @@ export const ParcelForm: FormModal = ({ lat, lng }) => {
                 </FormControl>
                 <SelectContent>
                   {RoadConditions.map((condition) => (
-                    <SelectItem key={condition} value={condition}>
+                    <SelectItem key={`car-condition-${condition}`} value={condition}>
                       {condition}
                     </SelectItem>
                   ))}

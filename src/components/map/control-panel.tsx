@@ -86,11 +86,11 @@ export function ControlPanel({ isMarking, toggleMarking }: ControlPanelProps) {
       <ScrollArea className="h-[300px] mt-4">
         <h3 className="font-bold mb-2">Puntos Marcados:</h3>
         {parcels.length === 0 ? (
-          <p className="text-gray-500 italic">No hay puntos marcados aún.</p>
+          <p className="text-gray-500 italic">No hay parcelas marcados aún.</p>
         ) : (
           <ul>
             {parcels.map((point, index) => (
-              <li key={`${index}-${point.name}`} className="mb-2 p-2 bg-gray-100 rounded">
+              <li key={`parcel-${index}-${point.name}`} className="mb-2 p-2 bg-gray-100 rounded">
                 <div className="flex flex-row gap-2 justify-between">
                   <div className="flex flex-col">
                     <span>{point.name || "Sin nombre"}</span>

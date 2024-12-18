@@ -163,7 +163,7 @@ export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
                         </FormControl>
                         <SelectContent>
                           {Object.entries(CarsType).map(([value, label]) => (
-                            <SelectItem key={value} value={value}>
+                            <SelectItem key={`car-${value}`} value={value}>
                               {label}
                             </SelectItem>
                           ))}
@@ -207,7 +207,7 @@ export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
                     );
                     if (!parcel) return null;
                     return (
-                      <div key={field.id} className="flex flex-row gap-2">
+                      <div key={`point-${index}-${parcel.name}`} className="flex flex-row gap-2">
                         <div className="w-full border border-border px-2 flex items-center justify-between rounded">
                           <span className="text-md">{parcel.name || "Sin nombre"}</span>
                           <small className="text-muted-foreground">
@@ -227,7 +227,10 @@ export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
                     );
                   })}
                   {coordinateFields.map((field, index) => (
-                    <div key={field.id} className="flex space-x-2 mt-2 w-full">
+                    <div
+                      key={`coordinate-${index}-${field.id}`}
+                      className="flex space-x-2 mt-2 w-full"
+                    >
                       <div className="flex flex-col">
                         <Input
                           {...form.register(`coordinates.${index}.0` as const, {
@@ -285,7 +288,7 @@ export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
                     </ButtonTitle>
                   </div>
                   {hintFields.map((field, index) => (
-                    <div key={field.id} className="flex items-center space-x-2 mt-2">
+                    <div key={`${field.id}-hint`} className="flex items-center space-x-2 mt-2">
                       <Input {...form.register(`point_hints.${index}`)} placeholder="Sugerencia" />
                       <Button
                         type="button"
@@ -320,7 +323,7 @@ export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
                         <PopoverContent className="w-[200px] p-0" align="start">
                           <div className="p-4 space-y-2">
                             {Object.entries(Snappings).map(([key, value]) => (
-                              <div key={key} className="flex items-center space-x-2">
+                              <div key={`snapping-${key}`} className="flex items-center space-x-2">
                                 <Checkbox
                                   id={`snap-${key}`}
                                   checked={field.value.includes(key as Snapping)}
@@ -373,7 +376,7 @@ export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
                         >
                           <div className="p-4 space-y-2">
                             {Object.entries(Details).map(([key, value]) => (
-                              <div key={key} className="flex items-center space-x-2">
+                              <div key={`detail-${key}`} className="flex items-center space-x-2">
                                 <Checkbox
                                   id={`detail-${key}`}
                                   checked={field.value.includes(key as Detail)}

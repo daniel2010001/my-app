@@ -107,12 +107,11 @@ export function IncidentForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {(parcels?.length > 0 &&
-                        parcels.map((parcel) => (
-                          <SelectItem key={parcel.id} value={parcel.id}>
-                            {parcel.name}
-                          </SelectItem>
-                        ))) || (
+                      {parcels.map((parcel) => (
+                        <SelectItem key={`parcel-affected-${parcel.id}`} value={parcel.id}>
+                          {parcel.name}
+                        </SelectItem>
+                      )) || (
                         <SelectItem value="0" disabled>
                           No hay parcelas
                         </SelectItem>
@@ -141,7 +140,7 @@ export function IncidentForm({
                     </FormControl>
                     <SelectContent>
                       {Object.entries(IncidentType).map(([key, value]) => (
-                        <SelectItem key={key} value={key}>
+                        <SelectItem key={`incident-type-${key}`} value={key}>
                           {value}
                         </SelectItem>
                       ))}
@@ -168,7 +167,7 @@ export function IncidentForm({
                     </FormControl>
                     <SelectContent>
                       {Object.entries(IncidentStatus).map(([key, value]) => (
-                        <SelectItem key={key} value={key}>
+                        <SelectItem key={`incident-status-${key}`} value={key}>
                           {value}
                         </SelectItem>
                       ))}

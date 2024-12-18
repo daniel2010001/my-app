@@ -48,15 +48,19 @@ export default function Home() {
   const { addIncident } = useIncidentStore();
   const { addRoute } = useRouteStore();
   const [isMarking, setIsMarking] = useState(false);
-  const [carForm, setCarForm] = useState(false);
-  const [incidentForm, setIncidentForm] = useState(false);
-  const [traceForm, setTraceForm] = useState(false);
+  const [openParcelForm, setParcelForm] = useState(false);
+  const [openCollectionCenterForm, setCollectionCenterForm] = useState(false);
+  const [openCarForm, setCarForm] = useState(false);
+  const [openIncidentForm, setIncidentForm] = useState(false);
+  const [openTraceForm, setTraceForm] = useState(false);
   const currentForm = useRef(ParcelForm);
   const setCurrentForm = (newFormModal: FormModal) => {
     currentForm.current = newFormModal;
   };
   function toggleMarking() {
     setIsMarking((prev) => !prev);
+    setParcelForm(false);
+    setCollectionCenterForm(false);
   }
 
   async function loadParcels() {
@@ -114,7 +118,9 @@ export default function Home() {
         <div className="col-span-1 flex flex-col h-full bg-white z-0 gap-2">
           <DropdownMenu onOpenChange={() => setCurrentForm(ParcelForm)}>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">{isMarking ? "Agregando Parcela..." : "Parcelas"}</Button>
+              <Button variant="outline">
+                {openParcelForm ? "Agregando Parcela..." : "Parcelas"}
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
               <DropdownMenuLabel>Opciones de Parcelas</DropdownMenuLabel>
@@ -123,10 +129,10 @@ export default function Home() {
                 <DropdownMenuItem
                   onClick={toggleMarking}
                   className={cn(
-                    isMarking && "text-white bg-red-500 focus:text-black focus:bg-red-300"
+                    openParcelForm && "text-white bg-red-500 focus:text-black focus:bg-red-300"
                   )}
                 >
-                  {isMarking ? "Cancelar" : "Agregar Parcela"}
+                  {openParcelForm ? "Cancelar" : "Agregar Parcela"}
                   <DropdownMenuShortcut>⇧⌘A</DropdownMenuShortcut>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={loadParcels}>
@@ -140,7 +146,7 @@ export default function Home() {
           <DropdownMenu onOpenChange={() => setCurrentForm(CollectionCenterForm)}>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
-                {isMarking ? "Agregando Centro de Acopio..." : "Centro de Acopio"}
+                {openCollectionCenterForm ? "Agregando Centro de Acopio..." : "Centro de Acopio"}
               </Button>
             </DropdownMenuTrigger>
 
@@ -151,10 +157,11 @@ export default function Home() {
                 <DropdownMenuItem
                   onClick={toggleMarking}
                   className={cn(
-                    isMarking && "text-white bg-red-500 focus:text-black focus:bg-red-300"
+                    openCollectionCenterForm &&
+                      "text-white bg-red-500 focus:text-black focus:bg-red-300"
                   )}
                 >
-                  {isMarking ? "Cancelar" : "Agregar Centro de Acopio"}
+                  {openCollectionCenterForm ? "Cancelar" : "Agregar Centro de Acopio"}
                   <DropdownMenuShortcut>⇧⌘A</DropdownMenuShortcut>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={loadCollectionCenters}>
@@ -227,14 +234,14 @@ export default function Home() {
 
           <ControlPanel isMarking={isMarking} toggleMarking={toggleMarking} />
         </div>
-        <CarForm isOpen={carForm} toggle={() => setCarForm((prev) => !prev)} />
+        <CarForm isOpen={openCarForm} toggle={() => setCarForm((prev) => !prev)} />
         <IncidentForm
-          isOpen={incidentForm}
+          isOpen={openIncidentForm}
           toggle={() => setIncidentForm((prev) => !prev)}
           parcels={parcels}
         />
         <TraceForm
-          isOpen={traceForm}
+          isOpen={openTraceForm}
           toggle={() => setTraceForm((prev) => !prev)}
           parcels={parcels}
         />

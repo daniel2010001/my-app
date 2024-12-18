@@ -53,7 +53,7 @@ export const CollectionCenterForm: FormModal = ({ lat, lng }) => {
       <form className="grid gap-4 py-4" onSubmit={form.handleSubmit(onSubmit)} autoComplete="off">
         {PointFormLayout.map(({ name, label, disabled }) => (
           <FormField
-            key={name}
+            key={`collection-center-${name}`}
             name={name}
             disabled={disabled}
             control={form.control}
