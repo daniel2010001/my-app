@@ -1,12 +1,12 @@
 import { z } from "zod";
 import { ValueOf } from ".";
 
-export const Available = {
+export const CarsAvailable = {
   AVAILABLE: "Disponible",
   MANTENIMIENTO: "Mantenimiento",
   ON_ROUTE: "En_Ruta",
 } as const;
-export type Available = keyof typeof Available;
+export type CarsAvailable = keyof typeof CarsAvailable;
 export const CarsType = {
   small_truck: "Camioneta",
   truck: "Camión",
@@ -18,7 +18,7 @@ export const CarSchema = z.object({
   type: z.enum(Object.keys(CarsType) as [CarType]),
   capacity: z.number().positive(),
   volume: z.number().positive(),
-  available: z.enum(Object.keys(Available) as [Available]),
+  available: z.enum(Object.keys(CarsAvailable) as [CarsAvailable]),
 });
 export type CarSchema = z.infer<typeof CarSchema>;
 
@@ -27,7 +27,7 @@ export type CarRequest = {
   tipo: string;
   capacidad_kg: number;
   volumen_max: string;
-  disponibilidad: ValueOf<typeof Available>;
+  disponibilidad: ValueOf<typeof CarsAvailable>;
 };
 
 export const CarResponseKeys = [
@@ -43,7 +43,7 @@ export type CarResponse = {
   tipo: string;
   capacidad_kg: number;
   volumen_max: string;
-  disponibilidad: ValueOf<typeof Available>;
+  disponibilidad: ValueOf<typeof CarsAvailable>;
 };
 
 export type Car = {
@@ -51,7 +51,7 @@ export type Car = {
   type: string;
   capacity: number;
   volume: number;
-  available: ValueOf<typeof Available>;
+  available: ValueOf<typeof CarsAvailable>;
 };
 
 export type CarsStore = {

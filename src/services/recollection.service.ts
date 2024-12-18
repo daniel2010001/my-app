@@ -7,7 +7,7 @@ export const getRecollections = () =>
   createAxiosCall<RecollectionResponse[]>("GET", __apiRecollections);
 
 export const createRecollection = (data: RecollectionRequest) =>
-  createAxiosCall<RecollectionResponse[], RecollectionRequest>("POST", __apiRecollections, data);
+  createAxiosCall<RecollectionResponse, RecollectionRequest>("POST", __apiRecollections, data);
 
 export const getRecollection = (id: Recollection["id"]) =>
   createAxiosCall<RecollectionResponse, RecollectionRequest>("GET", `${__apiRecollections}/${id}`);

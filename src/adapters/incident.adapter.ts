@@ -16,7 +16,7 @@ export class IncidentsAdapter {
 
   static toRequest(incident: IncidentSchema): IncidentRequest {
     return {
-      id_parcela: Number(incident.parcelId) ?? 0,
+      id_parcela: Number(incident.parcelId.split("-")[1]) ?? 0,
       tipo_incidencia: IncidentType[incident.type] ?? IncidentType.OTHER,
       descripcion: incident.description,
       impacto_kg: incident.impactKg ?? null,

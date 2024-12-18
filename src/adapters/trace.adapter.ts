@@ -43,7 +43,8 @@ export class TraceAdapter {
     };
   }
 
-  static toResponse(data: TraceFormData, points: Point[]): TraceRequest {
+  static toRequest(data: TraceFormData, points: Point[]): TraceRequest {
+    console.log(points, data.points);
     return {
       details: data.details,
       snap_preventions: data.snap_preventions,

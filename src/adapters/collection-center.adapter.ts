@@ -18,7 +18,12 @@ export class CollectionCentersAdapter {
   }
 
   static toCollectionCenters(data: CollectionCenterResponse): CollectionCenter {
-    return { id: data.id.toString(), name: data.nombre, lat: data.latitud, lng: data.longitud };
+    return {
+      id: `collection-center-${data.id}`,
+      name: data.nombre,
+      lat: data.latitud,
+      lng: data.longitud,
+    };
   }
 
   static toPoint(data: CollectionCenterResponse): Point {

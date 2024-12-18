@@ -13,9 +13,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { loadAbortable } from "@/lib";
 import { createCollectionCenter } from "@/services";
+import { useMapStore } from "@/store";
 import { FormModal } from "./form-modal";
 
 export const CollectionCenterForm: FormModal = ({ lat, lng }) => {
+  const { addPoint } = useMapStore();
   const PointFormSchema = z.object({
     name: z.string().min(1, { message: "El nombre es obligatorio" }).default(""),
     lat: z.number({ required_error: "La latitud es obligatoria" }).min(-90).max(90).default(lat),
@@ -39,6 +41,7 @@ export const CollectionCenterForm: FormModal = ({ lat, lng }) => {
       createCollectionCenter(CollectionCentersAdapter.toRequest(data))
     );
     if (!response || response instanceof Error) return toast.error("Error al guardar punto");
+    addPoint(CollectionCentersAdapter.toPoint(response.data));
     toast.success("Punto guardado correctamente");
   }
 

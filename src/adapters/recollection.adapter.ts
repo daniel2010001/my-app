@@ -14,12 +14,13 @@ export class RecollectionsAdapter {
   }
 
   static toRequest(recollection: RecollectionSchema): RecollectionRequest {
+    console.log(recollection);
     return {
-      id_parcela: recollection.id_parcela,
-      id_vehiculo: recollection.id_vehiculo,
-      id_centro: recollection.id_centro,
-      fecha: recollection.fecha,
-      estado: RecollectionStatus[recollection.estado] ?? RecollectionStatus.IN_PROGRESS,
+      id_parcela: Number(recollection.parcelId.split("-")[1]),
+      id_vehiculo: Number(recollection.carId.split("-")[1]),
+      id_centro: Number(recollection.centerId.split("-")[2]),
+      fecha: recollection.date,
+      estado: RecollectionStatus[recollection.status] ?? RecollectionStatus.IN_PROGRESS,
     };
   }
 

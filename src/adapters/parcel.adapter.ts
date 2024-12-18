@@ -6,6 +6,7 @@ import {
   ParcelResponse,
   ParcelSchema,
   Point,
+  RoadCondition,
 } from "@/models";
 import { IncidentsAdapter, RecollectionsAdapter } from ".";
 
@@ -14,7 +15,9 @@ export class ParcelsAdapter {
     return isObject(ParcelRequestKeys, data);
   }
 
-  static toRequest(parcel: ParcelSchema): ParcelRequest {
+  static toRequest(
+    parcel: ParcelSchema & { distanceKm: number; roadCondition: RoadCondition }
+  ): ParcelRequest {
     return {
       nombre: parcel.name,
       variedad_maiz: parcel.corn,
@@ -25,13 +28,13 @@ export class ParcelsAdapter {
       estado_via: parcel.roadCondition,
       ventana_inicio: parcel.windowStart,
       ventana_fin: parcel.windowEnd,
-      id_centro: parcel.centerId,
+      id_centro: Number(parcel.centerId),
     };
   }
 
   static toParcel(parcel: ParcelResponse): Parcel {
     return {
-      id: parcel.id.toString(),
+      id: `parcel-${parcel.id}`,
       name: parcel.nombre,
       corn: parcel.variedad_maiz,
       lat: Number(parcel.latitud),

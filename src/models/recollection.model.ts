@@ -8,12 +8,11 @@ export const RecollectionStatus = {
 } as const;
 export type RecollectionStatus = keyof typeof RecollectionStatus;
 export const RecollectionSchema = z.object({
-  id: z.number(),
-  id_parcela: z.number(),
-  id_vehiculo: z.number(),
-  id_centro: z.number(),
-  fecha: z.date(),
-  estado: z.enum(Object.keys(RecollectionStatus) as [RecollectionStatus]),
+  parcelId: z.string(),
+  carId: z.string(),
+  centerId: z.string(),
+  date: z.date(),
+  status: z.enum(Object.keys(RecollectionStatus) as [RecollectionStatus]),
 });
 export type RecollectionSchema = z.infer<typeof RecollectionSchema>;
 

@@ -24,16 +24,16 @@ export const ParcelSchema = z.object({
   lat: z.number().refine((value) => value !== 0, { message: "El valor no puede ser 0" }),
   lng: z.number().refine((value) => value !== 0, { message: "El valor no puede ser 0" }),
   amountKg: z.number().positive({ message: "La cantidad tiene que ser positiva" }),
-  distanceKm: z
-    .number()
-    .positive({ message: "La cantidad tiene que ser positiva" })
-    .refine((value) => value < 1000, {
-      message: "La distancia no puede ser mayor a 1000 km",
-    }),
-  roadCondition: z.enum(RoadConditions),
+  // distanceKm: z
+  //   .number()
+  //   .positive({ message: "La cantidad tiene que ser positiva" })
+  //   .refine((value) => value < 1000, {
+  //     message: "La distancia no puede ser mayor a 1000 km",
+  //   }),
+  // roadCondition: z.enum(RoadConditions),
   windowStart: z.date(),
   windowEnd: z.date(),
-  centerId: z.number(),
+  centerId: z.string(),
 });
 export type ParcelSchema = z.infer<typeof ParcelSchema>;
 

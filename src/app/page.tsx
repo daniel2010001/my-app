@@ -56,6 +56,7 @@ import {
   useRecollectionStore,
   useRouteStore,
 } from "@/store";
+import { RecollectionForm } from "@/components/map";
 
 const MapaInteractivo = dynamic(() => import("@/components/map/map"), { ssr: false });
 
@@ -198,7 +199,7 @@ export default function Home() {
   return (
     <Tabs defaultValue="tab1" className="w-full h-[calc(100vh-6rem)]">
       <TabsList className="flex flex-row items-center justify-centerw-full">
-        <div className="flex flex-row w-full bg-white z-0 gap-2">
+        <div className="flex flex-row w-full bg-white gap-2">
           <DropdownMenu onOpenChange={() => setCurrentForm(ParcelForm)}>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
@@ -366,9 +367,6 @@ export default function Home() {
         <div className="h-[calc(100vh-8rem)] w-full mt-4 z-0">
           <MapaInteractivo isMarking={isMarking} FormComponent={currentForm.current} />
         </div>
-        <CarForm isOpen={openCarForm} toggle={() => setCarForm((prev) => !prev)} />
-        <IncidentForm isOpen={openIncidentForm} toggle={() => setIncidentForm((prev) => !prev)} />
-        <TraceForm isOpen={openTraceForm} toggle={() => setTraceForm((prev) => !prev)} />
       </TabsContent>
 
       <TabsContent value="tab2">
@@ -421,6 +419,7 @@ export default function Home() {
               data={cars}
               columns={[
                 { key: "id", label: "ID" },
+                { key: "available", label: "Disponibilidad" },
                 { key: "type", label: "Tipo" },
                 { key: "capacity", label: "Capacidad" },
                 { key: "volume", label: "Volumen" },
@@ -487,6 +486,14 @@ export default function Home() {
           </TabsContent>
         </Tabs>
       </TabsContent>
+
+      <CarForm isOpen={openCarForm} toggle={() => setCarForm((prev) => !prev)} />
+      <IncidentForm isOpen={openIncidentForm} toggle={() => setIncidentForm((prev) => !prev)} />
+      <TraceForm isOpen={openTraceForm} toggle={() => setTraceForm((prev) => !prev)} />
+      <RecollectionForm
+        isOpen={openRecollectionForm}
+        toggle={() => setRecollectionForm((prev) => !prev)}
+      />
     </Tabs>
   );
 }

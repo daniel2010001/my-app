@@ -29,7 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { loadAbortable } from "@/lib";
-import { Available, CarSchema, CarsType } from "@/models";
+import { CarsAvailable, CarSchema, CarsType } from "@/models";
 import { createCar } from "@/services";
 
 export function CarForm({ isOpen, toggle }: { isOpen: boolean; toggle: () => void }) {
@@ -131,7 +131,7 @@ export function CarForm({ isOpen, toggle }: { isOpen: boolean; toggle: () => voi
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.entries(Available).map(([key, value]) => (
+                      {Object.entries(CarsAvailable).map(([key, value]) => (
                         <SelectItem key={`vehicle-${key}`} value={key}>
                           {value}
                         </SelectItem>
