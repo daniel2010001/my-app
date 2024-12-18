@@ -3,6 +3,8 @@
 import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
 
+import { FormModal } from "@/components/map/form-modal";
+import { ParcelForm } from "@/components/map/parcel-form";
 import { CarForm } from "@/components/map/car-form";
 import { CollectionCenterForm } from "@/components/map/collection-center-form";
 import { ControlPanel } from "@/components/map/control-panel";
@@ -19,9 +21,8 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useMapStore, useParcelStore } from "@/store";
 import { cn } from "@/lib";
-import { FormModal, ParcelForm } from "@/components/map";
+import { useMapStore, useParcelStore } from "@/store";
 
 const MapaInteractivo = dynamic(() => import("@/components/map/map"), { ssr: false });
 
