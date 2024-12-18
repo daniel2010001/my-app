@@ -33,6 +33,7 @@ export const ParcelSchema = z.object({
   roadCondition: z.enum(RoadConditions),
   windowStart: z.date(),
   windowEnd: z.date(),
+  centerId: z.number(),
 });
 export type ParcelSchema = z.infer<typeof ParcelSchema>;
 
@@ -57,6 +58,7 @@ export type ParcelRequest = {
   estado_via: RoadCondition;
   ventana_inicio: Date;
   ventana_fin: Date;
+  id_centro: number;
 };
 
 export const ParcelResponseKeys = [

@@ -24,6 +24,7 @@ export class ParcelsAdapter {
       estado_via: parcel.roadCondition,
       ventana_inicio: parcel.windowStart,
       ventana_fin: parcel.windowEnd,
+      id_centro: parcel.centerId,
     };
   }
 
