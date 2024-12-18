@@ -7,8 +7,12 @@ export async function GET() {
   try {
     const parcelas = await prisma.parcela.findMany({
       orderBy: { id: "asc" },
+      include: { recolecciones: true, incidencias: true },
     });
-    return NextResponse.json({ success: true, result: parcelas }, { status: 200 });
+    return NextResponse.json(
+      { success: true, result: parcelas },
+      { status: 200 }
+    );
   } catch (error) {
     console.error(error);
     return NextResponse.json(
@@ -29,7 +33,10 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     const _parcela = await prisma.parcela.create({ data });
-    return NextResponse.json({ success: true, result: _parcela }, { status: 201 });
+    return NextResponse.json(
+      { success: true, result: _parcela },
+      { status: 201 }
+    );
     /* const {
       nombre,
       variedad_maiz,

@@ -10,6 +10,7 @@ export async function GET(req: NextRequest, { params }: Context) {
   try {
     const parcela = await prisma.parcela.findUnique({
       where: { id: Number(id) },
+      include: { recolecciones: true, incidencias: true },
     });
     if (!parcela) {
       return NextResponse.json({ error: "Parcela not found" }, { status: 404 });
