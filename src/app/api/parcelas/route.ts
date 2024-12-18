@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       );
     const _parcela = await prisma.parcela.create({ data });
     return NextResponse.json({ success: true, result: _parcela }, { status: 201 });
-    const {
+    /* const {
       nombre,
       variedad_maiz,
       latitud,
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
         ventana_inicio,
       },
     });
-    return NextResponse.json({ success: true, result: parcela }, { status: 201 });
+    return NextResponse.json({ success: true, result: parcela }, { status: 201 }); */
   } catch (error) {
     console.error(error);
     return NextResponse.json(

@@ -2,10 +2,19 @@ import { z } from "zod";
 import { ValueOf } from ".";
 
 export const Corns = ["Blanco", "Amarillo", "Morado"] as const;
-export const Corn = { WHITE: "Blanco", YELLOW: "Amarillo", GREEN: "Morado" } as const;
+export const Corn = {
+  WHITE: "Blanco",
+  YELLOW: "Amarillo",
+  GREEN: "Morado",
+} as const;
 export type Corn = ValueOf<typeof Corn>;
 
-export const RoadConditions = ["Muy_Buena", "Buena", "Regular", "Mala"] as const;
+export const RoadConditions = [
+  "Muy_Buena",
+  "Buena",
+  "Regular",
+  "Mala",
+] as const;
 export const RoadCondition = {
   VERY_GOOD: "Muy_Buena",
   GOOD: "Buena",
@@ -17,13 +26,21 @@ export type RoadCondition = ValueOf<typeof RoadCondition>;
 export const ParcelSchema = z.object({
   name: z.string().min(1, { message: "El nombre es obligatorio" }),
   corn: z.enum(Corns, { message: "El tipo de maíz es obligatorio" }),
-  lat: z.number().refine((value) => value !== 0, { message: "El valor no puede ser 0" }),
-  lng: z.number().refine((value) => value !== 0, { message: "El valor no puede ser 0" }),
-  amountKg: z.number().positive({ message: "La cantidad tiene que ser positiva" }),
+  lat: z
+    .number()
+    .refine((value) => value !== 0, { message: "El valor no puede ser 0" }),
+  lng: z
+    .number()
+    .refine((value) => value !== 0, { message: "El valor no puede ser 0" }),
+  amountKg: z
+    .number()
+    .positive({ message: "La cantidad tiene que ser positiva" }),
   distanceKm: z
     .number()
     .positive({ message: "La cantidad tiene que ser positiva" })
-    .refine((value) => value < 1000, { message: "La distancia no puede ser mayor a 1000 km" }),
+    .refine((value) => value < 1000, {
+      message: "La distancia no puede ser mayor a 1000 km",
+    }),
   roadCondition: z.enum(RoadConditions),
   windowStart: z.date(),
   windowEnd: z.date(),
