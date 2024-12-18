@@ -71,7 +71,7 @@ export function CarForm({ isOpen, toggle }: { isOpen: boolean; toggle: () => voi
                     </FormControl>
                     <SelectContent>
                       {Object.entries(CarsType).map(([key, value]) => (
-                        <SelectItem key={key} value={key}>
+                        <SelectItem key={`car-${key}`} value={key}>
                           {value}
                         </SelectItem>
                       ))}
@@ -132,7 +132,7 @@ export function CarForm({ isOpen, toggle }: { isOpen: boolean; toggle: () => voi
                     </FormControl>
                     <SelectContent>
                       {Object.entries(Available).map(([key, value]) => (
-                        <SelectItem key={key} value={key}>
+                        <SelectItem key={`vehicle-${key}`} value={key}>
                           {value}
                         </SelectItem>
                       ))}

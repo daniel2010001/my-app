@@ -56,7 +56,7 @@ export type Car = {
 
 export type CarsStore = {
   cars: Car[];
-  addCar: (car: Car) => void;
+  addCar: (car: Car | Car[]) => void;
   deleteCar: (id: Car["id"]) => void;
   clearCars: () => void;
 };

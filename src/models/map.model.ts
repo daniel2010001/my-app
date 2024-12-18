@@ -3,11 +3,11 @@ export type Line = { id: string; points: [number, number][] };
 
 export interface MapStore {
   points: Point[];
-  addPoint: (point: Point) => void;
+  addPoint: (point: Point | Point[]) => void;
   deletePoint: (id: Point["id"]) => void;
   clearPoints: () => void;
   lines: Line[];
-  addLine: (route: Line[]) => void;
+  addLine: (route: Line[] | Line) => void;
   deleteLine: (id: Line["id"]) => void;
   clearLines: () => void;
   bounds: [[number, number], [number, number]];

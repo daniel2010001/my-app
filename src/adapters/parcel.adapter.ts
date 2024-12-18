@@ -1,5 +1,12 @@
 import { isObject } from "@/lib";
-import { Parcel, ParcelRequest, ParcelRequestKeys, ParcelResponse, ParcelSchema } from "@/models";
+import {
+  Parcel,
+  ParcelRequest,
+  ParcelRequestKeys,
+  ParcelResponse,
+  ParcelSchema,
+  Point,
+} from "@/models";
 
 export class ParcelsAdapter {
   static isParcelRequest(data: unknown): data is ParcelRequest {
@@ -35,6 +42,15 @@ export class ParcelsAdapter {
       windowEnd: new Date(parcel.ventana_fin),
       incidents: parcel.incidencias,
       collections: parcel.recolecciones,
+    };
+  }
+
+  static toPoint(parcel: ParcelResponse): Point {
+    return {
+      id: parcel.id.toString(),
+      lat: Number(parcel.latitud),
+      lng: Number(parcel.longitud),
+      name: parcel.nombre,
     };
   }
 }

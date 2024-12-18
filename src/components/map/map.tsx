@@ -56,12 +56,11 @@ export const Map: FC<MapProps> = ({ isMarking, FormComponent, points, lines, bou
       <FormModalContent isMarking={isMarking} FormComponent={FormComponent} />
       {lines.length > 0 &&
         lines.map(({ points, id }) => (
-          <Polyline key={id} positions={points} color={generateColor(id)} />
+          <Polyline key={`polyline-${id}`} positions={points} color={generateColor(id)} />
         ))}
-      {points.length > 0 &&
-        points.map((punto, index) => (
-          <Marker key={index} position={[punto.lat, punto.lng]} title={punto.name} />
-        ))}
+      {points.map((punto) => (
+        <Marker key={`marker-${punto.id}`} position={[punto.lat, punto.lng]} title={punto.name} />
+      ))}
       <CenterMapComponent bounds={bounds} />
     </MapContainer>
   );

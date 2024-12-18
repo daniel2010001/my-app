@@ -64,7 +64,7 @@ export function Combobox({
               <CommandGroup>
                 {options.map((framework) => (
                   <CommandItem
-                    key={framework.value}
+                    key={`combobox-${framework.value}-${framework.label}`}
                     value={framework.value}
                     onSelect={(currentValue) => {
                       onChange(currentValue === value ? "" : currentValue);
