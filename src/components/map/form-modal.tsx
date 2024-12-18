@@ -29,7 +29,7 @@ export const FormModalContent: FC<FormModalContentProps> = ({ isMarking, FormCom
     setIsModalOpen(false);
     setClickedPosition(null);
   }
-  return clickedPosition ? (
+  return clickedPosition && clickedPosition[0] && clickedPosition[1] ? (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <FormComponent lat={clickedPosition[0]} lng={clickedPosition[1]} />

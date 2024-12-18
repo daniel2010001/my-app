@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { CarForm } from "@/components/map/car-form";
 import { CollectionCenterForm } from "@/components/map/collection-center-form";
@@ -20,6 +20,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useMapStore, useParcelStore } from "@/store";
+import { cn } from "@/lib";
+import { FormModal, ParcelForm } from "@/components/map";
 
 const MapaInteractivo = dynamic(() => import("@/components/map/map"), { ssr: false });
 
@@ -30,6 +32,14 @@ export default function Home() {
   const [carForm, setCarForm] = useState(false);
   const [incidentForm, setIncidentForm] = useState(false);
   const [traceForm, setTraceForm] = useState(false);
+  const currentForm = useRef(ParcelForm);
+  const setCurrentForm = (newFormModal: FormModal) => {
+    currentForm.current = newFormModal;
+  };
+
+  function toggleMarking() {
+    setIsMarking((prev) => !prev);
+  }
 
   return (
     <div className="flex flex-col items-center justify-center h-full w-full">
@@ -39,14 +49,67 @@ export default function Home() {
         <div className="col-span-3 h-full">
           <MapaInteractivo
             isMarking={isMarking}
-            FormComponent={CollectionCenterForm}
+            FormComponent={currentForm.current}
             points={points}
             lines={routes}
             bounds={bounds}
           />
         </div>
 
-        <div className="col-span-1 h-full bg-white z-0">
+        <div className="col-span-1 flex flex-col h-full bg-white z-0 gap-2">
+          <DropdownMenu onOpenChange={() => setCurrentForm(ParcelForm)}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">{isMarking ? "Agregando Parcela..." : "Parcelas"}</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuLabel>Opciones de Parcelas</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  onClick={toggleMarking}
+                  className={cn(
+                    isMarking && "text-white bg-red-500 focus:text-black focus:bg-red-300"
+                  )}
+                >
+                  {isMarking ? "Cancelar" : "Agregar Parcela"}
+                  <DropdownMenuShortcut>⇧⌘A</DropdownMenuShortcut>
+                </DropdownMenuItem>
+                <DropdownMenuItem disabled>
+                  Cargar Parcelas
+                  <DropdownMenuShortcut>⇧⌘C</DropdownMenuShortcut>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu onOpenChange={() => setCurrentForm(CollectionCenterForm)}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                {isMarking ? "Agregando Centro de Acopio..." : "Centro de Acopio"}
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuLabel>Opciones de Centro de Acopio</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  onClick={toggleMarking}
+                  className={cn(
+                    isMarking && "text-white bg-red-500 focus:text-black focus:bg-red-300"
+                  )}
+                >
+                  {isMarking ? "Cancelar" : "Agregar Centro de Acopio"}
+                  <DropdownMenuShortcut>⇧⌘A</DropdownMenuShortcut>
+                </DropdownMenuItem>
+                <DropdownMenuItem disabled>
+                  Cargar Centro de Acopio
+                  <DropdownMenuShortcut>⇧⌘C</DropdownMenuShortcut>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">Vehículos</Button>
@@ -106,7 +169,8 @@ export default function Home() {
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-          <ControlPanel isMarking={isMarking} toggleMarking={() => setIsMarking((prev) => !prev)} />
+
+          <ControlPanel isMarking={isMarking} toggleMarking={toggleMarking} />
         </div>
         <CarForm isOpen={carForm} toggle={() => setCarForm((prev) => !prev)} />
         <IncidentForm

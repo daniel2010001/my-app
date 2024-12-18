@@ -33,7 +33,7 @@ import { createParcel } from "@/services";
 export const ParcelForm: FormModal = ({ lat, lng }) => {
   const form = useForm<ParcelSchema>({
     resolver: zodResolver(ParcelSchema),
-    defaultValues: { name: "", amountKg: 0, distanceKm: 0, lat, lng },
+    defaultValues: { name: "", amountKg: 0, distanceKm: 0, lat: lat ?? 0, lng: lng ?? 0 },
   });
   const { windowEnd, windowStart } = form.formState.errors;
 

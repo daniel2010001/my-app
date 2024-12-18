@@ -1,12 +1,20 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+"use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
+import { IncidentsAdapter } from "@/adapters";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -20,6 +28,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
@@ -29,14 +38,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { loadAbortable } from "@/lib";
 import { cn } from "@/lib/utils";
 import { IncidentSchema, IncidentStatus, IncidentType, Parcel } from "@/models";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { IncidentsAdapter } from "@/adapters";
-import { loadAbortable } from "@/lib";
 import { createIncident } from "@/services";
-import { toast } from "sonner";
+
+import { CalendarIcon, Loader2 } from "lucide-react";
 
 export function IncidentForm({
   isOpen,
@@ -47,6 +54,7 @@ export function IncidentForm({
   toggle: () => void;
   parcels: Parcel[];
 }) {
+  const [reset, setReset] = useState(true);
   const form = useForm<IncidentSchema>({
     resolver: zodResolver(IncidentSchema),
     defaultValues: {
@@ -67,9 +75,12 @@ export function IncidentForm({
     if (!response || response instanceof Error) return toast.error("Error al guardar incidente");
     toast.success("Incidente guardado correctamente");
   }
-
+  function onReset() {
+    toggle();
+    if (reset) form.reset();
+  }
   return (
-    <Dialog open={isOpen} onOpenChange={toggle}>
+    <Dialog open={isOpen} onOpenChange={onReset}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Añadir nuevo Incidente</DialogTitle>
@@ -84,12 +95,14 @@ export function IncidentForm({
               control={form.control}
               name="parcelId"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Parcela afectada</FormLabel>
-                  <FormDescription></FormDescription>
+                <FormItem className="flex flex-wrap justify-between items-center">
+                  <FormLabel className="h-full flex flex-col gap-2">
+                    Parcela afectada
+                    <FormDescription>Selecciona la parcela afectada</FormDescription>
+                  </FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-[200px]">
                         <SelectValue placeholder="Selecciona una parcela" />
                       </SelectTrigger>
                     </FormControl>
@@ -258,7 +271,23 @@ export function IncidentForm({
                 </FormItem>
               )}
             />
-            <Button type="submit">Enviar</Button>
+            <DialogFooter className="mt-2 flex !justify-between items-center ">
+              <div className="flex items-center space-x-2">
+                <Checkbox checked={reset} onCheckedChange={() => setReset((prev) => !prev)} />
+                <Label>Reiniciar al generar</Label>
+              </div>
+
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? (
+                  <>
+                    <Loader2 className="animate-spin" />
+                    Cargando...
+                  </>
+                ) : (
+                  "Registrar incidente"
+                )}
+              </Button>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>
