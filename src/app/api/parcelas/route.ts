@@ -23,13 +23,13 @@ export async function POST(req: NextRequest) {
   try {
     // ejemplo de cómo parsear datos de la petición
     const data = await req.json();
-    if (ParcelsAdapter.isParcelRequest(data)) {
-      const parcela = await prisma.parcela.create({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        data: data as any,
-      });
-      return NextResponse.json({ success: true, result: parcela }, { status: 201 });
-    }
+    if (!ParcelsAdapter.isParcelRequest(data))
+      return NextResponse.json(
+        { success: false, error: { message: "Error parsing parcel data" } },
+        { status: 400 }
+      );
+    const _parcela = await prisma.parcela.create({ data });
+    return NextResponse.json({ success: true, result: _parcela }, { status: 201 });
     const {
       nombre,
       variedad_maiz,
@@ -40,8 +40,6 @@ export async function POST(req: NextRequest) {
       estado_via,
       ventana_fin,
       ventana_inicio,
-      incidencias,
-      recolecciones,
     } = await req.json();
     const parcela = await prisma.parcela.create({
       data: {
@@ -54,8 +52,6 @@ export async function POST(req: NextRequest) {
         estado_via,
         ventana_fin,
         ventana_inicio,
-        incidencias,
-        recolecciones,
       },
     });
     return NextResponse.json({ success: true, result: parcela }, { status: 201 });

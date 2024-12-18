@@ -1,35 +1,33 @@
 import { create, StateCreator } from "zustand";
 import { persist } from "zustand/middleware";
 
-import { PointsAdapter } from "@/adapters";
-import { loadAbortable } from "@/lib";
 import { MapStore } from "@/models";
-import { getPoints } from "@/services";
 
 const __mapStoreMiddleware = (
   initializer: StateCreator<MapStore, [["zustand/persist", unknown]], []>
-) =>
-  persist(initializer, {
-    name: "map-store",
-    onRehydrateStorage: () => async (state) => {
-      if (!state) return state;
-      const response = await loadAbortable(getPoints());
-      if (!response || response instanceof Error) state.points = [];
-      else state.points = response.data.map(PointsAdapter.toPoint);
-      return state;
-    },
-  });
+) => persist(initializer, { name: "map-store" });
 
 export const useMapStore = create<MapStore>()(
   __mapStoreMiddleware((set) => ({
     points: [],
-    routePoints: [],
-    setRoutePoints: (routePoints) => set(() => ({ routePoints })),
     addPoint: (point) => set((state) => ({ points: state.points.concat(point) })),
     deletePoint: (id) =>
       set((state) => ({ points: state.points.filter((point) => point.id !== id) })),
-    updatePoint: (id, point) =>
-      set((state) => ({ points: state.points.map((p) => (p.id === id ? { ...p, ...point } : p)) })),
     clearPoints: () => set(() => ({ points: [] })),
+    lines: [],
+    addLine: (route) => set((state) => ({ lines: state.lines.concat(route) })),
+    deleteLine: (id) => set((state) => ({ lines: state.lines.filter((route) => route.id !== id) })),
+    clearLines: () => set(() => ({ lines: [] })),
+    bounds: [
+      [-17.62, -66.1],
+      [-17.66, -65.7],
+    ],
+    setBounds: (bbox) =>
+      set(() => ({
+        bounds: [
+          [bbox[1], bbox[0]],
+          [bbox[3], bbox[2]],
+        ],
+      })),
   }))
 );

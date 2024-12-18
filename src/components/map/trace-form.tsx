@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 
-import { RouteAdapter } from "@/adapters";
+import { TraceAdapter } from "@/adapters";
 import { Button } from "@/components/ui/button";
 import { ButtonTitle } from "@/components/ui/button-title";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -42,13 +42,13 @@ import {
   CarsType,
   Detail,
   Details,
-  Point,
-  RouteFormData,
-  routeSchema,
+  Parcel,
+  TraceFormData,
+  TraceSchema,
   Snapping,
   Snappings,
 } from "@/models";
-import { getRoute } from "@/services";
+import { traceRoute } from "@/services";
 import { useMapStore } from "@/store";
 
 import { ChevronDown, Loader2, Plus, Trash2 } from "lucide-react";
@@ -56,17 +56,17 @@ import { ChevronDown, Loader2, Plus, Trash2 } from "lucide-react";
 interface RouteFormProps {
   isOpen: boolean;
   toggle: () => void;
-  points: Point[];
+  parcels: Parcel[];
 }
 
-export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
+export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
   const [reset, setReset] = useState(true);
-  const setRoutePoints = useMapStore((state) => state.setRoutePoints);
+  const { addLine, setBounds } = useMapStore();
 
-  const form = useForm<RouteFormData>({
-    resolver: zodResolver(routeSchema),
+  const form = useForm<TraceFormData>({
+    resolver: zodResolver(TraceSchema),
     defaultValues: {
-      vehicle: "car",
+      vehicle: "truck",
       points: [],
       coordinates: [],
       point_hints: [],
@@ -91,11 +91,26 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
     remove: removeHint,
   } = useFieldArray({ control: form.control, name: "point_hints" as "coordinates" });
 
-  async function onSubmit(data: RouteFormData) {
-    const response = await loadAbortable(getRoute(RouteAdapter.toRouteResponse(data, points)));
+  async function onSubmit(data: TraceFormData) {
+    const response = await loadAbortable(traceRoute(TraceAdapter.toTraceResponse(data, parcels)));
     if (!response || response instanceof Error) return;
-    const routes = response.data.map(RouteAdapter.toRoute);
-    setRoutePoints(routes.map(({ points }) => points));
+    const traces = response.data.map(TraceAdapter.toTrace);
+    const idLine = Date.now().toString();
+    addLine(traces.map(({ points }, index) => ({ points, id: idLine + index })));
+    const bbox: [number, number, number, number] = traces
+      .map(({ bbox }) => bbox)
+      .reduce(
+        (acc, curr) => {
+          return [
+            Math.min(acc[0], curr[0]),
+            Math.min(acc[1], curr[1]),
+            Math.max(acc[2], curr[2]),
+            Math.max(acc[3], curr[3]),
+          ];
+        },
+        [Infinity, Infinity, -Infinity, -Infinity]
+      );
+    setBounds(bbox);
     if (reset) form.reset();
     toggle();
   }
@@ -106,7 +121,7 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
   }
 
   function selectPoint(id: string) {
-    const point = points.find((point) => point.id === id);
+    const point = parcels.find((point) => point.id === id);
     if (!point) return;
     const formPoints = form.watch("points");
     formPoints.push(id);
@@ -161,9 +176,9 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
 
                 <div className="flex flex-col space-y-2">
                   <div className="flex items-center justify-between">
-                    <FormLabel className="">Puntos</FormLabel>
+                    <FormLabel>Puntos</FormLabel>
                     <Combobox
-                      options={points
+                      options={parcels
                         .filter(({ id }) => !form.watch("points").includes(id))
                         .map(({ id, name }) => ({ value: id, label: name }))}
                       value={""}
@@ -187,14 +202,16 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
                     </Combobox>
                   </div>
                   {pointsFields.map((field, index) => {
-                    const point = points.find((point) => point.id === form.watch("points")[index]);
-                    if (!point) return null;
+                    const parcel = parcels.find(
+                      (parcel) => parcel.id === form.watch("points")[index]
+                    );
+                    if (!parcel) return null;
                     return (
                       <div key={field.id} className="flex flex-row gap-2">
                         <div className="w-full border border-border px-2 flex items-center justify-between rounded">
-                          <span className="text-md">{point.name || "Sin nombre"}</span>
+                          <span className="text-md">{parcel.name || "Sin nombre"}</span>
                           <small className="text-muted-foreground">
-                            Lat: {point.lat.toFixed(6)}, Lng: {point.lng.toFixed(6)}
+                            Lat: {parcel.lat.toFixed(6)}, Lng: {parcel.lng.toFixed(6)}
                           </small>
                         </div>
                         <ButtonTitle
@@ -388,7 +405,6 @@ export function RouteForm({ isOpen, toggle, points }: RouteFormProps) {
               </TabsContent>
 
               <DialogFooter className="mt-2 flex !justify-between items-center ">
-                {/* TODO: add checkbox by resetting form */}
                 <div className="flex items-center space-x-2">
                   <Checkbox checked={reset} onCheckedChange={() => setReset((prev) => !prev)} />
                   <Label>Reiniciar al generar</Label>

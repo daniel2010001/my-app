@@ -1,11 +1,11 @@
 "use client";
 
 import L from "leaflet";
-import { FC, useState } from "react";
-import { MapContainer, Marker, Polyline, TileLayer, useMapEvents } from "react-leaflet";
+import { FC, useEffect } from "react";
+import { MapContainer, Marker, Polyline, TileLayer, useMap } from "react-leaflet";
 
-import { useMapStore } from "@/store";
-import { FormModal, FormModalContent } from "./form-modal";
+import { Line, Point } from "@/models";
+import { FormModalContent, FormModalContentProps } from "./form-modal";
 
 import "leaflet/dist/leaflet.css";
 
@@ -15,58 +15,54 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-interface MapProps {
-  isMarking: boolean;
-  FormComponent: FormModal;
+interface CenterMapComponentProps {
+  bounds: [[number, number], [number, number]];
 }
 
-function ClickHandler({ isMarking, FormComponent }: MapProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [clickedPosition, setClickedPosition] = useState<[number, number] | null>(null);
+const CenterMapComponent: React.FC<CenterMapComponentProps> = ({ bounds }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.fitBounds(bounds);
+  }, [map, bounds]);
+  return null;
+};
 
-  useMapEvents({
-    click(e) {
-      if (isMarking) {
-        setClickedPosition([e.latlng.lat, e.latlng.lng]);
-        setIsModalOpen(true);
-      }
-    },
-  });
+interface MapProps extends FormModalContentProps, CenterMapComponentProps {
+  points: Point[];
+  lines: Line[];
+}
 
-  function onClose() {
-    setIsModalOpen(false);
-    setClickedPosition(null);
+export const Map: FC<MapProps> = ({ isMarking, FormComponent, points, lines, bounds }) => {
+  function generateColor(id: string): string {
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+      hash = id.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const color = Math.floor(Math.abs(Math.sin(hash) * 16777215) % 16777215).toString(16);
+    return "#" + "000000".substring(0, 6 - color.length) + color;
   }
 
-  return clickedPosition ? (
-    <FormModalContent
-      open={isModalOpen}
-      onOpenChange={onClose}
-      FormComponent={FormComponent}
-      lat={clickedPosition[0]}
-      lng={clickedPosition[1]}
-    />
-  ) : null;
-}
-
-export const Map: FC<MapProps> = ({ isMarking, FormComponent }) => {
-  const points = useMapStore((state) => state.points);
-  const routePoints = useMapStore((state) => state.routePoints);
   return (
     <MapContainer
-      center={[-17.392352, -66.159042]}
-      zoom={13}
+      center={[-17.64, -65.9]}
+      zoom={12}
       className="relative w-full h-full rounded-lg border-spacing-1 border-teal-900 border-2"
     >
+      {isMarking}
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      <ClickHandler isMarking={isMarking} FormComponent={FormComponent} />
-      {routePoints.length > 0 && <Polyline positions={routePoints} color="blue" />}
-      {points.map((punto, index) => (
-        <Marker key={index} position={[punto.lat, punto.lng]} title={punto.name} />
-      ))}
+      <FormModalContent isMarking={isMarking} FormComponent={FormComponent} />
+      {lines.length > 0 &&
+        lines.map(({ points, id }) => (
+          <Polyline key={id} positions={points} color={generateColor(id)} />
+        ))}
+      {points.length > 0 &&
+        points.map((punto, index) => (
+          <Marker key={index} position={[punto.lat, punto.lng]} title={punto.name} />
+        ))}
+      <CenterMapComponent bounds={bounds} />
     </MapContainer>
   );
 };

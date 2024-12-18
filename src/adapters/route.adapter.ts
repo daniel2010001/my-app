@@ -1,60 +1,30 @@
-import { decode } from "@googlemaps/polyline-codec";
-
 import { isObject } from "@/lib";
-import {
-  Point,
-  Route,
-  RouteFormData,
-  RouteRequest,
-  RouteResponse,
-  RouteResponseKeys,
-} from "@/models";
+import { Route, RouteRequest, RouteRequestKeys, RouteResponse, RouteSchema } from "@/models";
 
-export class RouteAdapter {
-  static isRouteResponse(routeResponse: unknown): routeResponse is RouteResponse {
-    return isObject(RouteResponseKeys, routeResponse);
+export class RoutesAdapter {
+  static isRouteRequest(data: unknown): data is RouteRequest {
+    return isObject(RouteRequestKeys, data);
   }
 
-  static coordinatesConvert({ coordinates }: { coordinates: [number, number] }): [number, number] {
-    return [coordinates[1], coordinates[0]];
-  }
-
-  static toRoute(routeResponse: unknown): Route {
-    if (!RouteAdapter.isRouteResponse(routeResponse))
-      throw new Error("RouteResponse is not a valid RouteResponse");
-    const points = routeResponse.points_encoded
-      ? decode(routeResponse.points)
-      : routeResponse.points.map(this.coordinatesConvert);
-    const snappedWaypoints = routeResponse.points_encoded
-      ? decode(routeResponse.snapped_waypoints)
-      : routeResponse.snapped_waypoints.map(this.coordinatesConvert);
+  static toRouteRequest(route: RouteSchema): RouteRequest {
     return {
-      distance: routeResponse.distance,
-      weight: routeResponse.weight,
-      time: routeResponse.time,
-      bbox: routeResponse.bbox,
-      ascend: routeResponse.ascend,
-      descend: routeResponse.descend,
-      details: routeResponse.details,
-      instructions: routeResponse.instructions,
-      pointsOrder: routeResponse.points_order,
-      points,
-      snappedWaypoints,
+      id_origen: route.origen,
+      id_destino: route.destino,
+      texto: route.text,
+      distancia_km: route.distanceKm,
+      tiempo_estimado: route.timeEstimated,
     };
   }
 
-  static toRouteResponse(data: RouteFormData, points: Point[]): RouteRequest {
+  static toRoute(route: RouteResponse): Route {
     return {
-      details: data.details,
-      snap_preventions: data.snap_preventions,
-      vehicle: data.vehicle,
-      point_hints: data.point_hints,
-      points: [
-        ...points
-          .filter(({ id }) => data.points.includes(id))
-          .map<[number, number]>(({ lat, lng }) => [lng, lat]),
-        ...data.coordinates.map<[number, number]>(([lat, lng]) => [lng, lat]),
-      ],
+      id: route.id.toString(),
+      idOrigen: route.id_origen.toString(),
+      idDestino: route.id_destino.toString(),
+      points: JSON.parse(route.texto),
+      distanceKm: route.distancia_km,
+      timeEstimated: route.tiempo_estimado,
+      cost: route.costo,
     };
   }
 }

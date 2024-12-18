@@ -1,11 +1,15 @@
-import { Point } from "./points.model";
+export type Point = { id: string; lat: number; lng: number; name: string };
+export type Line = { id: string; points: [number, number][] };
 
 export interface MapStore {
   points: Point[];
-  routePoints: [number, number][][];
-  setRoutePoints: (route: [number, number][][]) => void;
   addPoint: (point: Point) => void;
-  deletePoint: (id: string) => void;
-  updatePoint: (id: string, point: Partial<Point>) => void;
+  deletePoint: (id: Point["id"]) => void;
   clearPoints: () => void;
+  lines: Line[];
+  addLine: (route: Line[]) => void;
+  deleteLine: (id: Line["id"]) => void;
+  clearLines: () => void;
+  bounds: [[number, number], [number, number]];
+  setBounds: (bbox: [number, number, number, number]) => void;
 }

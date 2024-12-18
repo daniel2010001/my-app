@@ -12,11 +12,11 @@ export class CollectionCentersAdapter {
     return isObject(CollectionCenterRequestKeys, data);
   }
 
-  static toCollectionCentersResponse(data: CollectionCentersSchema): CollectionCenterRequest {
+  static toCollectionCentersRequest(data: CollectionCentersSchema): CollectionCenterRequest {
     return { nombre: data.name, latitud: data.lat, longitud: data.lng };
   }
 
   static toCollectionCenters(data: CollectionCenterResponse): CollectionCenter {
-    return { id: data.id, name: data.nombre, lat: data.latitud, lng: data.longitud };
+    return { id: data.id.toString(), name: data.nombre, lat: data.latitud, lng: data.longitud };
   }
 }

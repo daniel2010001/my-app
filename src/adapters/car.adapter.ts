@@ -1,5 +1,5 @@
 import { isObject } from "@/lib";
-import { Car, CarRequest, CarRequestKeys, CarResponse, CarSchema } from "@/models";
+import { Car, CarRequest, CarRequestKeys, CarResponse, CarSchema, Available } from "@/models";
 
 export class CarsAdapter {
   static isCarRequest(data: unknown): data is CarRequest {
@@ -10,20 +10,18 @@ export class CarsAdapter {
     return {
       tipo: car.type,
       capacidad_kg: car.capacity,
-      volumen_max: car.volume,
-      disponibilidad: car.available,
-      recolecciones: car.collections,
+      volumen_max: car.volume.toString(),
+      disponibilidad: Available[car.available],
     };
   }
 
   static toCar(car: CarResponse): Car {
     return {
-      id: car.id,
+      id: car.id.toString(),
       type: car.tipo,
       capacity: car.capacidad_kg,
-      volume: car.volumen_max,
+      volume: Number(car.volumen_max),
       available: car.disponibilidad,
-      collections: car.recolecciones,
     };
   }
 }
