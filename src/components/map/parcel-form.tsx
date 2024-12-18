@@ -5,7 +5,7 @@ import { DateRange } from "react-day-picker";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { ParcelsAdapter } from "@/adapters";
+import { ParcelsAdapter, TraceAdapter } from "@/adapters";
 import { Button } from "@/components/ui/button";
 import { DatePickerWithRange } from "@/components/ui/date-ranger-picker";
 import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -26,14 +26,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { loadAbortable } from "@/lib";
-import { Corns, ParcelSchema, RoadConditions } from "@/models";
+import { Corns, ParcelSchema, RoadCondition } from "@/models";
+import { createParcel, traceRoute } from "@/services";
+import { useCollectionCenterStore, useMapStore } from "@/store";
 import { FormModal } from "./form-modal";
-import { createParcel } from "@/services";
 
 export const ParcelForm: FormModal = ({ lat, lng }) => {
+  const { collectionCenters } = useCollectionCenterStore();
+  const { points, addPoint, setBounds } = useMapStore();
   const form = useForm<ParcelSchema>({
     resolver: zodResolver(ParcelSchema),
-    defaultValues: { name: "", amountKg: 0, distanceKm: 0, lat: lat ?? 0, lng: lng ?? 0 },
+    defaultValues: { name: "", amountKg: 0, lat: lat ?? 0, lng: lng ?? 0 },
   });
   const { windowEnd, windowStart } = form.formState.errors;
 
@@ -48,8 +51,53 @@ export const ParcelForm: FormModal = ({ lat, lng }) => {
   }
 
   async function onSubmit(data: ParcelSchema) {
-    const response = await loadAbortable(createParcel(ParcelsAdapter.toParcelRequest(data)));
+    const center = collectionCenters.find((center) => center.id === data.centerId);
+    if (!center) return toast.error("Error al guardar parcela");
+    const payload = TraceAdapter.toRequest(
+      {
+        vehicle: "truck",
+        points: [],
+        coordinates: [
+          [data.lat, data.lng],
+          [center.lat, center.lng],
+        ],
+        point_hints: [],
+        snap_preventions: [],
+        details: [],
+      },
+      points
+    );
+    console.log(payload);
+    const request = await loadAbortable(traceRoute(payload));
+    if (!request || request instanceof Error) return toast.error("Error al guardar parcela");
+    const values = Object.values(RoadCondition);
+    const randomIndex = Math.floor(Math.random() * values.length); // Seleccionar el valor aleatorio const randomValue = values[randomIndex];
+    const response = await loadAbortable(
+      createParcel(
+        ParcelsAdapter.toRequest({
+          ...data,
+          distanceKm:
+            request.data.map((trace) => trace.distance).reduce((acc, curr) => acc + curr) / 1000,
+          roadCondition: values[randomIndex],
+        })
+      )
+    );
     if (!response || response instanceof Error) return toast.error("Error al guardar parcela");
+    addPoint(ParcelsAdapter.toPoint(response.data));
+    const bbox: [number, number, number, number] = request.data
+      .map(({ bbox }) => bbox)
+      .reduce(
+        (acc, curr) => {
+          return [
+            Math.min(acc[0], curr[0]),
+            Math.min(acc[1], curr[1]),
+            Math.max(acc[2], curr[2]),
+            Math.max(acc[3], curr[3]),
+          ];
+        },
+        [Infinity, Infinity, -Infinity, -Infinity]
+      );
+    setBounds(bbox);
     toast.success("Parcela guardada correctamente");
   }
 
@@ -90,7 +138,7 @@ export const ParcelForm: FormModal = ({ lat, lng }) => {
                 </FormControl>
                 <SelectContent>
                   {Corns.map((corn) => (
-                    <SelectItem key={corn} value={corn}>
+                    <SelectItem key={`corn-${corn}`} value={corn}>
                       {corn}
                     </SelectItem>
                   ))}
@@ -121,40 +169,26 @@ export const ParcelForm: FormModal = ({ lat, lng }) => {
 
         <FormField
           control={form.control}
-          name="distanceKm"
+          name="centerId"
           render={({ field }) => (
             <FormItem className="flex flex-wrap justify-between items-center">
-              <FormLabel>Distancia (km)</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  className="w-56"
-                  onChange={(e) => field.onChange(parseFloat(e.target.value || "0"))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="roadCondition"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Condición del camino</FormLabel>
+              <FormLabel className="h-full flex flex-col gap-2">Centro de Acopio</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona la condición del camino" />
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Selecciona una almacén" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {RoadConditions.map((condition) => (
-                    <SelectItem key={condition} value={condition}>
-                      {condition}
+                  {collectionCenters.map((parcel) => (
+                    <SelectItem key={`collection-center-${parcel.id}`} value={parcel.id}>
+                      {parcel.name}
                     </SelectItem>
-                  ))}
+                  )) || (
+                    <SelectItem value="0" disabled>
+                      No hay parcelas
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
               <FormMessage />

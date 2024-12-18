@@ -14,18 +14,20 @@ datasource db {
 }
 
 model Parcela {
-  id              Int      @id @default(autoincrement())
-  nombre          String
-  variedad_maiz   VariedadMaiz
-  latitud         Decimal  @db.Decimal(10, 8)
-  longitud        Decimal  @db.Decimal(11, 8)
-  cantidad_kg     Int
-  distancia_km    Decimal @db.Decimal(5, 2)
-  estado_via      EstadoVia
-  ventana_inicio  DateTime @db.Date
-  ventana_fin     DateTime @db.Date
-  incidencias     Incidencia[]
-  recolecciones   Recoleccion[]
+  id             Int           @id @default(autoincrement())
+  nombre         String
+  variedad_maiz  VariedadMaiz
+  latitud        Decimal       @db.Decimal(10, 8)
+  longitud       Decimal       @db.Decimal(11, 8)
+  cantidad_kg    Int
+  distancia_km   Decimal       @db.Decimal(5, 2)
+  estado_via     EstadoVia
+  ventana_inicio DateTime      @db.Date
+  ventana_fin    DateTime      @db.Date
+  id_centro      Int
+  centroAcopio   CentroAcopio  @relation(fields: [id_centro], references: [id])
+  incidencias    Incidencia[]
+  recolecciones  Recoleccion[]
 }
 
 enum VariedadMaiz {
@@ -42,12 +44,12 @@ enum EstadoVia {
 }
 
 model Vehiculo {
-  id              Int      @id @default(autoincrement())
-  tipo            String
-  capacidad_kg    Int
-  volumen_max     Decimal  @db.Decimal(10, 2)
-  disponibilidad  Disponibilidad
-  recolecciones   Recoleccion[]
+  id             Int            @id @default(autoincrement())
+  tipo           String
+  capacidad_kg   Int
+  volumen_max    Decimal        @db.Decimal(10, 2)
+  disponibilidad Disponibilidad
+  recolecciones  Recoleccion[]
 }
 
 enum Disponibilidad {
@@ -57,17 +59,18 @@ enum Disponibilidad {
 }
 
 model CentroAcopio {
-  id            Int      @id @default(autoincrement())
+  id            Int           @id @default(autoincrement())
   nombre        String
-  latitud       Decimal  @db.Decimal(10, 8)
-  longitud      Decimal  @db.Decimal(11, 8)
-  rutas_origen  Ruta[]   @relation("RutasOrigen")
-  rutas_destino Ruta[]   @relation("RutasDestino")
+  latitud       Decimal       @db.Decimal(10, 8)
+  longitud      Decimal       @db.Decimal(11, 8)
+  rutas_origen  Ruta[]        @relation("RutasOrigen")
+  rutas_destino Ruta[]        @relation("RutasDestino")
   recolecciones Recoleccion[]
+  Parcela       Parcela[]
 }
 
 model Ruta {
-  id              Int         @id @default(autoincrement())
+  id              Int          @id @default(autoincrement())
   origen          CentroAcopio @relation("RutasOrigen", fields: [id_origen], references: [id])
   id_origen       Int
   destino         CentroAcopio @relation("RutasDestino", fields: [id_destino], references: [id])
@@ -79,15 +82,15 @@ model Ruta {
 }
 
 model Recoleccion {
-  id            Int      @id @default(autoincrement())
-  parcela       Parcela  @relation(fields: [id_parcela], references: [id])
-  id_parcela    Int
-  vehiculo      Vehiculo @relation(fields: [id_vehiculo], references: [id])
-  id_vehiculo   Int
-  centroAcopio  CentroAcopio @relation(fields: [id_centro], references: [id])
-  id_centro     Int
-  fecha         DateTime @db.Date @default(now())
-  estado        EstadoRecoleccion
+  id           Int               @id @default(autoincrement())
+  parcela      Parcela           @relation(fields: [id_parcela], references: [id], onDelete: Cascade)
+  id_parcela   Int
+  vehiculo     Vehiculo          @relation(fields: [id_vehiculo], references: [id])
+  id_vehiculo  Int
+  centroAcopio CentroAcopio      @relation(fields: [id_centro], references: [id])
+  id_centro    Int
+  fecha        DateTime          @default(now()) @db.Date
+  estado       EstadoRecoleccion
 }
 
 enum EstadoRecoleccion {
@@ -97,14 +100,14 @@ enum EstadoRecoleccion {
 }
 
 model Incidencia {
-  id             Int      @id @default(autoincrement())
-  parcela        Parcela  @relation(fields: [id_parcela], references: [id])
-  id_parcela     Int
-  fecha_incidencia DateTime? @db.Date @default(now())
-  tipo_incidencia String
-  descripcion    String
-  impacto_kg     Int?
-  nueva_fecha    DateTime? @db.Date
-  estado_actual  String?
-  observaciones  String?
+  id               Int       @id @default(autoincrement())
+  parcela          Parcela   @relation(fields: [id_parcela], references: [id], onDelete: Cascade)
+  id_parcela       Int
+  fecha_incidencia DateTime? @default(now()) @db.Date
+  tipo_incidencia  String
+  descripcion      String
+  impacto_kg       Int?
+  nueva_fecha      DateTime? @db.Date
+  estado_actual    String?
+  observaciones    String?
 }

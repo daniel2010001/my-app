@@ -1,12 +1,23 @@
 import { isObject } from "@/lib";
-import { Parcel, ParcelRequest, ParcelRequestKeys, ParcelResponse, ParcelSchema } from "@/models";
+import {
+  Parcel,
+  ParcelRequest,
+  ParcelRequestKeys,
+  ParcelResponse,
+  ParcelSchema,
+  Point,
+  RoadCondition,
+} from "@/models";
+import { IncidentsAdapter, RecollectionsAdapter } from ".";
 
 export class ParcelsAdapter {
-  static isParcelRequest(data: unknown): data is ParcelRequest {
+  static isRequest(data: unknown): data is ParcelRequest {
     return isObject(ParcelRequestKeys, data);
   }
 
-  static toParcelRequest(parcel: ParcelSchema): ParcelRequest {
+  static toRequest(
+    parcel: ParcelSchema & { distanceKm: number; roadCondition: RoadCondition }
+  ): ParcelRequest {
     return {
       nombre: parcel.name,
       variedad_maiz: parcel.corn,
@@ -17,12 +28,13 @@ export class ParcelsAdapter {
       estado_via: parcel.roadCondition,
       ventana_inicio: parcel.windowStart,
       ventana_fin: parcel.windowEnd,
+      id_centro: Number(parcel.centerId),
     };
   }
 
   static toParcel(parcel: ParcelResponse): Parcel {
     return {
-      id: parcel.id.toString(),
+      id: `parcel-${parcel.id}`,
       name: parcel.nombre,
       corn: parcel.variedad_maiz,
       lat: Number(parcel.latitud),
@@ -32,8 +44,18 @@ export class ParcelsAdapter {
       roadCondition: parcel.estado_via,
       windowStar: new Date(parcel.ventana_inicio),
       windowEnd: new Date(parcel.ventana_fin),
-      incidents: parcel.incidencias,
-      collections: parcel.recolecciones,
+      incidents: parcel.incidencias.map(IncidentsAdapter.toIncident),
+      collections: parcel.recolecciones.map(RecollectionsAdapter.toRecollection),
+    };
+  }
+
+  static toPoint(parcel: ParcelResponse): Point {
+    return {
+      id: `parcel-${parcel.id}`,
+      lat: Number(parcel.latitud),
+      lng: Number(parcel.longitud),
+      name: parcel.nombre,
+      icon: "parcel",
     };
   }
 }

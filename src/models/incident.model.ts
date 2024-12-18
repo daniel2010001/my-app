@@ -13,7 +13,7 @@ export const IncidentType = {
 export type IncidentType = keyof typeof IncidentType;
 
 export const IncidentStatus = {
-  IN_PROGRESS: "En Curso",
+  IN_PROGRESS: "En_Curso",
   PENDING: "Pendiente",
   COMPLETED: "Completada",
 } as const;
@@ -72,18 +72,18 @@ export type IncidentResponse = {
 
 export type Incident = {
   id: string;
-  id_parcela: number;
-  tipo_incidencia: ValueOf<typeof IncidentType>;
-  descripcion: string;
-  impacto_kg: number | null;
-  nueva_fecha: Date | null;
-  estado_actual: ValueOf<typeof IncidentStatus> | null;
-  observaciones: string | null;
+  parcelID: number;
+  type: ValueOf<typeof IncidentType>;
+  description: string;
+  impactKg: number | null;
+  data: Date | null;
+  status: ValueOf<typeof IncidentStatus> | null;
+  observations: string | null;
 };
 
 export type IncidentsStore = {
   incidents: Incident[];
-  addIncident: (incident: Incident) => void;
+  addIncident: (incident: Incident | Incident[]) => void;
   deleteIncident: (id: Incident["id"]) => void;
   clearIncidents: () => void;
 };

@@ -27,7 +27,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen`}>
-        {children}
+        <div className="flex flex-col min-h-screen">
+          <main className="flex-grow container mx-auto px-4 py-8">{children}</main>
+        </div>
         <Toaster richColors closeButton />
       </body>
     </html>

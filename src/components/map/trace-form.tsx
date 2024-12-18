@@ -42,26 +42,26 @@ import {
   CarsType,
   Detail,
   Details,
-  Parcel,
-  TraceFormData,
-  TraceSchema,
   Snapping,
   Snappings,
+  TraceFormData,
+  TraceSchema,
 } from "@/models";
 import { traceRoute } from "@/services";
-import { useMapStore } from "@/store";
+import { useCollectionCenterStore, useMapStore, useParcelStore } from "@/store";
 
 import { ChevronDown, Loader2, Plus, Trash2 } from "lucide-react";
 
 interface RouteFormProps {
   isOpen: boolean;
   toggle: () => void;
-  parcels: Parcel[];
 }
 
-export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
+export function TraceForm({ isOpen, toggle }: RouteFormProps) {
   const [reset, setReset] = useState(true);
-  const { addLine, setBounds } = useMapStore();
+  const { points, addLine, setBounds } = useMapStore();
+  const { parcels } = useParcelStore();
+  const { collectionCenters } = useCollectionCenterStore();
 
   const form = useForm<TraceFormData>({
     resolver: zodResolver(TraceSchema),
@@ -92,7 +92,7 @@ export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
   } = useFieldArray({ control: form.control, name: "point_hints" as "coordinates" });
 
   async function onSubmit(data: TraceFormData) {
-    const response = await loadAbortable(traceRoute(TraceAdapter.toTraceResponse(data, parcels)));
+    const response = await loadAbortable(traceRoute(TraceAdapter.toRequest(data, points)));
     if (!response || response instanceof Error) return;
     const traces = response.data.map(TraceAdapter.toTrace);
     const idLine = Date.now().toString();
@@ -121,10 +121,11 @@ export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
   }
 
   function selectPoint(id: string) {
-    const point = parcels.find((point) => point.id === id);
+    const point = points.find((point) => point.id === id);
     if (!point) return;
     const formPoints = form.watch("points");
     formPoints.push(id);
+    console.log(formPoints);
     form.setValue("points", formPoints);
   }
 
@@ -157,13 +158,13 @@ export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
                       <FormLabel>Vehículo</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="w-[200px]">
+                          <SelectTrigger className="w-[240px]">
                             <SelectValue placeholder="Selecciona un vehículo" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           {Object.entries(CarsType).map(([value, label]) => (
-                            <SelectItem key={value} value={value}>
+                            <SelectItem key={`car-${value}`} value={value}>
                               {label}
                             </SelectItem>
                           ))}
@@ -178,9 +179,14 @@ export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
                   <div className="flex items-center justify-between">
                     <FormLabel>Puntos</FormLabel>
                     <Combobox
-                      options={parcels
-                        .filter(({ id }) => !form.watch("points").includes(id))
-                        .map(({ id, name }) => ({ value: id, label: name }))}
+                      options={[
+                        ...collectionCenters
+                          .filter(({ id }) => !form.watch("points").includes(id))
+                          .map(({ id, name }) => ({ value: id, label: name })),
+                        ...parcels
+                          .filter(({ id }) => !form.watch("points").includes(id))
+                          .map(({ id, name }) => ({ value: id, label: name })),
+                      ]}
                       value={""}
                       onChange={selectPoint}
                       placeholder={
@@ -201,33 +207,37 @@ export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
                       </ButtonTitle>
                     </Combobox>
                   </div>
-                  {pointsFields.map((field, index) => {
-                    const parcel = parcels.find(
+                  {pointsFields.map((_, index) => {
+                    const point = points.find(
                       (parcel) => parcel.id === form.watch("points")[index]
                     );
-                    if (!parcel) return null;
-                    return (
-                      <div key={field.id} className="flex flex-row gap-2">
-                        <div className="w-full border border-border px-2 flex items-center justify-between rounded">
-                          <span className="text-md">{parcel.name || "Sin nombre"}</span>
-                          <small className="text-muted-foreground">
-                            Lat: {parcel.lat.toFixed(6)}, Lng: {parcel.lng.toFixed(6)}
-                          </small>
+                    if (point)
+                      return (
+                        <div key={`point-${index}-${point.name}`} className="flex flex-row gap-2">
+                          <div className="w-full border border-border px-2 flex items-center justify-between rounded">
+                            <span className="text-md">{point.name || "Sin nombre"}</span>
+                            <small className="text-muted-foreground">
+                              Lat: {point.lat.toFixed(6)}, Lng: {point.lng.toFixed(6)}
+                            </small>
+                          </div>
+                          <ButtonTitle
+                            type="button"
+                            onClick={() => removePoint(index)}
+                            variant="outline"
+                            size={"icon"}
+                            title="Borrar punto"
+                          >
+                            <Trash2 />
+                          </ButtonTitle>
                         </div>
-                        <ButtonTitle
-                          type="button"
-                          onClick={() => removePoint(index)}
-                          variant="outline"
-                          size={"icon"}
-                          title="Borrar punto"
-                        >
-                          <Trash2 />
-                        </ButtonTitle>
-                      </div>
-                    );
+                      );
+                    return null;
                   })}
                   {coordinateFields.map((field, index) => (
-                    <div key={field.id} className="flex space-x-2 mt-2 w-full">
+                    <div
+                      key={`coordinate-${index}-${field.id}`}
+                      className="flex space-x-2 mt-2 w-full"
+                    >
                       <div className="flex flex-col">
                         <Input
                           {...form.register(`coordinates.${index}.0` as const, {
@@ -285,7 +295,7 @@ export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
                     </ButtonTitle>
                   </div>
                   {hintFields.map((field, index) => (
-                    <div key={field.id} className="flex items-center space-x-2 mt-2">
+                    <div key={`${field.id}-hint`} className="flex items-center space-x-2 mt-2">
                       <Input {...form.register(`point_hints.${index}`)} placeholder="Sugerencia" />
                       <Button
                         type="button"
@@ -320,7 +330,7 @@ export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
                         <PopoverContent className="w-[200px] p-0" align="start">
                           <div className="p-4 space-y-2">
                             {Object.entries(Snappings).map(([key, value]) => (
-                              <div key={key} className="flex items-center space-x-2">
+                              <div key={`snapping-${key}`} className="flex items-center space-x-2">
                                 <Checkbox
                                   id={`snap-${key}`}
                                   checked={field.value.includes(key as Snapping)}
@@ -373,7 +383,7 @@ export function TraceForm({ isOpen, toggle, parcels }: RouteFormProps) {
                         >
                           <div className="p-4 space-y-2">
                             {Object.entries(Details).map(([key, value]) => (
-                              <div key={key} className="flex items-center space-x-2">
+                              <div key={`detail-${key}`} className="flex items-center space-x-2">
                                 <Checkbox
                                   id={`detail-${key}`}
                                   checked={field.value.includes(key as Detail)}

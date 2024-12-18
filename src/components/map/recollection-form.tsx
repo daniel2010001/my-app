@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { IncidentsAdapter } from "@/adapters";
+import { RecollectionsAdapter } from "@/adapters";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -27,7 +27,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
@@ -37,50 +36,50 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { loadAbortable } from "@/lib";
 import { cn } from "@/lib/utils";
-import { IncidentSchema, IncidentStatus, IncidentType } from "@/models";
-import { createIncident } from "@/services";
-import { useParcelStore } from "@/store";
+import { CarsAvailable, RecollectionSchema, RecollectionStatus } from "@/models";
+import { createRecollection } from "@/services";
+import {
+  useCarStore,
+  useCollectionCenterStore,
+  useParcelStore,
+  useRecollectionStore,
+} from "@/store";
 
 import { CalendarIcon, Loader2 } from "lucide-react";
 
-export function IncidentForm({ isOpen, toggle }: { isOpen: boolean; toggle: () => void }) {
-  const parcels = useParcelStore((state) => state.parcels);
+export function RecollectionForm({ isOpen, toggle }: { isOpen: boolean; toggle: () => void }) {
+  const { parcels } = useParcelStore();
+  const { collectionCenters } = useCollectionCenterStore();
+  const { cars } = useCarStore();
+  const { addRecollection } = useRecollectionStore();
   const [reset, setReset] = useState(true);
-  const form = useForm<IncidentSchema>({
-    resolver: zodResolver(IncidentSchema),
-    defaultValues: {
-      parcelId: "",
-      type: "BREACH",
-      status: "PENDING",
-      description: "",
-      impactKg: 0,
-      newCollectionDate: new Date(),
-      observations: "",
-    },
+  const form = useForm<RecollectionSchema>({
+    resolver: zodResolver(RecollectionSchema),
+    defaultValues: { parcelId: "", carId: "", centerId: "" },
   });
 
-  async function onSubmit(values: IncidentSchema) {
-    const response = await loadAbortable(createIncident(IncidentsAdapter.toRequest(values)));
+  async function onSubmit(values: RecollectionSchema) {
+    const response = await loadAbortable(
+      createRecollection(RecollectionsAdapter.toRequest(values))
+    );
     if (!response || response instanceof Error) return toast.error("Error al guardar incidente");
+    addRecollection(RecollectionsAdapter.toRecollection(response.data));
     toast.success("Incidente guardado correctamente");
   }
   function onReset() {
     toggle();
     if (reset) form.reset();
   }
-  console.log("render incident form");
   return (
     <Dialog open={isOpen} onOpenChange={onReset}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Añadir nuevo Incidente</DialogTitle>
+          <DialogTitle>Añadir nuevo Recolección</DialogTitle>
         </DialogHeader>
         <DialogDescription>
-          Ingresa los detalles de la nueva colección aquí. Haz clic en enviar cuando hayas
-          terminado.
+          Ingresa los detalles de la nueva recolección aquí. Haz clic en enviar cuando hayas
         </DialogDescription>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
@@ -90,8 +89,8 @@ export function IncidentForm({ isOpen, toggle }: { isOpen: boolean; toggle: () =
               render={({ field }) => (
                 <FormItem className="flex flex-wrap justify-between items-center">
                   <FormLabel className="h-full flex flex-col gap-2">
-                    Parcela afectada
-                    <FormDescription>Selecciona la parcela afectada</FormDescription>
+                    Parcela
+                    <FormDescription>Selecciona la parcela para la recolección</FormDescription>
                   </FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
@@ -101,7 +100,7 @@ export function IncidentForm({ isOpen, toggle }: { isOpen: boolean; toggle: () =
                     </FormControl>
                     <SelectContent>
                       {parcels.map((parcel) => (
-                        <SelectItem key={`parcel-affected-${parcel.id}`} value={parcel.id}>
+                        <SelectItem key={`parcel-recollection-${parcel.id}`} value={parcel.id}>
                           {parcel.name}
                         </SelectItem>
                       )) || (
@@ -118,48 +117,89 @@ export function IncidentForm({ isOpen, toggle }: { isOpen: boolean; toggle: () =
 
             <FormField
               control={form.control}
-              name="type"
+              name="carId"
               render={({ field }) => (
                 <FormItem className="flex flex-wrap justify-between items-center">
                   <FormLabel className="h-full flex flex-col gap-2">
-                    Tipo de Incidente
-                    <FormDescription>Seleccione el tipo de incidente</FormDescription>
+                    Vehículo
+                    <FormDescription>Selecciona el vehículo para la recolección</FormDescription>
                   </FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger className="w-[200px]">
-                        <SelectValue placeholder="Seleccione el tipo de incidente" />
+                        <SelectValue placeholder="Selecciona una vehículo" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.entries(IncidentType).map(([key, value]) => (
-                        <SelectItem key={`incident-type-${key}`} value={key}>
-                          {value}
+                      {cars.map((car) => (
+                        <SelectItem
+                          key={`car-recollection-${car.id}`}
+                          value={car.id}
+                          disabled={car.available !== CarsAvailable.AVAILABLE}
+                        >
+                          {car.capacity} - {car.volume} cilindros
                         </SelectItem>
-                      ))}
+                      )) || (
+                        <SelectItem value="0" disabled>
+                          No hay vehiculos disponibles
+                        </SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="centerId"
+              render={({ field }) => (
+                <FormItem className="flex flex-wrap justify-between items-center">
+                  <FormLabel className="h-full flex flex-col gap-2">
+                    Centro de Acopio
+                    <FormDescription>Selecciona el almacén para la recolección</FormDescription>
+                  </FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="w-[200px]">
+                        <SelectValue placeholder="Selecciona una almacén" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {collectionCenters.map((parcel) => (
+                        <SelectItem key={`collection-center-${parcel.id}`} value={parcel.id}>
+                          {parcel.name}
+                        </SelectItem>
+                      )) || (
+                        <SelectItem value="0" disabled>
+                          No hay parcelas
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="status"
               render={({ field }) => (
                 <FormItem className="flex flex-wrap justify-between items-center">
                   <FormLabel className="h-full flex flex-col gap-2">
-                    Estado del Incidente
-                    <FormDescription>Seleccione el estado actual del incidente</FormDescription>
+                    Estado de la Recolección
+                    <FormDescription>Seleccione el estado de la recolección</FormDescription>
                   </FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger className="w-[200px]">
-                        <SelectValue placeholder="Seleccione el estado del incidente" />
+                        <SelectValue placeholder="Seleccione el estado" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.entries(IncidentStatus).map(([key, value]) => (
+                      {Object.entries(RecollectionStatus).map(([key, value]) => (
                         <SelectItem key={`incident-status-${key}`} value={key}>
                           {value}
                         </SelectItem>
@@ -170,55 +210,15 @@ export function IncidentForm({ isOpen, toggle }: { isOpen: boolean; toggle: () =
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descripción</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} placeholder="Describa el incidente" />
-                  </FormControl>
-                  <FormDescription>
-                    Proporcione una descripción detallada del incidente
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="impactKg"
-              render={({ field }) => (
-                <FormItem className="flex flex-wrap justify-between items-center">
-                  <FormLabel className="h-full flex flex-col gap-2">
-                    Impacto en Kg
-                    <FormDescription>Ingrese el impacto en Kg (opcional)</FormDescription>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      {...field}
-                      onChange={(e) =>
-                        field.onChange(e.target.value ? Number(e.target.value) : undefined)
-                      }
-                      className="w-[200px]"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="newCollectionDate"
+              name="date"
               render={({ field }) => (
                 <FormItem className="flex flex-row justify-between !mt-4">
                   <FormLabel className="h-full flex flex-col gap-2">
-                    Nueva Fecha de Recolección
-                    <FormDescription>
-                      Seleccione la nueva fecha de recolección (opcional)
-                    </FormDescription>
+                    Fecha de Recolección
+                    <FormDescription>Seleccione la fecha de recolección</FormDescription>
                   </FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -240,7 +240,7 @@ export function IncidentForm({ isOpen, toggle }: { isOpen: boolean; toggle: () =
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
-                        disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                        disabled={(date) => date < new Date("1900-01-01")}
                         initialFocus
                       />
                     </PopoverContent>
@@ -249,20 +249,7 @@ export function IncidentForm({ isOpen, toggle }: { isOpen: boolean; toggle: () =
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="observations"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Observaciones</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} placeholder="Añada observaciones adicionales" />
-                  </FormControl>
-                  <FormDescription>Añada observaciones adicionales (opcional)</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
             <DialogFooter className="mt-2 flex !justify-between items-center ">
               <div className="flex items-center space-x-2">
                 <Checkbox checked={reset} onCheckedChange={() => setReset((prev) => !prev)} />

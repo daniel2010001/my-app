@@ -1,27 +1,36 @@
 import { isObject } from "@/lib";
-import { Car, CarRequest, CarRequestKeys, CarResponse, CarSchema, Available } from "@/models";
+import { Car, CarRequest, CarRequestKeys, CarResponse, CarSchema, CarsAvailable } from "@/models";
 
 export class CarsAdapter {
-  static isCarRequest(data: unknown): data is CarRequest {
+  static isRequest(data: unknown): data is CarRequest {
     return isObject(CarRequestKeys, data);
   }
 
-  static toCarRequest(car: CarSchema): CarRequest {
+  static toRequest(car: CarSchema): CarRequest {
     return {
       tipo: car.type,
       capacidad_kg: car.capacity,
       volumen_max: car.volume.toString(),
-      disponibilidad: Available[car.available],
+      disponibilidad: CarsAvailable[car.available],
     };
   }
 
   static toCar(car: CarResponse): Car {
     return {
-      id: car.id.toString(),
+      id: `car-${car.id}`,
       type: car.tipo,
       capacity: car.capacidad_kg,
       volume: Number(car.volumen_max),
       available: car.disponibilidad,
     };
   }
+
+  // static toPoint(car: CarResponse): Point {
+  //   return {
+  //     id: `car-${car.id}`,
+  //     lat: Number(car.latitud),
+  //     lng: Number(car.longitud),
+  //     name: car.tipo,
+  //   };
+  // }
 }

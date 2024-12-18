@@ -37,7 +37,7 @@ export function Combobox({
 }: ComboboxDemoProps) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="flex w-[200px] relative">
+    <div className="flex w-[240px] relative">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -50,7 +50,7 @@ export function Combobox({
             <ChevronsUpDown className="opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0">
+        <PopoverContent className="w-[240px] p-0">
           <Command>
             <CommandInput placeholder="Buscar opción..." className="h-9" />
             <CommandList>
@@ -64,7 +64,7 @@ export function Combobox({
               <CommandGroup>
                 {options.map((framework) => (
                   <CommandItem
-                    key={framework.value}
+                    key={`combobox-${framework.value}-${framework.label}`}
                     value={framework.value}
                     onSelect={(currentValue) => {
                       onChange(currentValue === value ? "" : currentValue);

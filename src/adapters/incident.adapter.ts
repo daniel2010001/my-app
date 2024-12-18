@@ -10,13 +10,13 @@ import {
 } from "@/models";
 
 export class IncidentsAdapter {
-  static isIncidentRequest(data: unknown): data is IncidentRequest {
+  static isRequest(data: unknown): data is IncidentRequest {
     return isObject(IncidentRequestKeys, data);
   }
 
-  static toIncidentRequest(incident: IncidentSchema): IncidentRequest {
+  static toRequest(incident: IncidentSchema): IncidentRequest {
     return {
-      id_parcela: Number(incident.parcelId) ?? 0,
+      id_parcela: Number(incident.parcelId.split("-")[1]) ?? 0,
       tipo_incidencia: IncidentType[incident.type] ?? IncidentType.OTHER,
       descripcion: incident.description,
       impacto_kg: incident.impactKg ?? null,
@@ -29,13 +29,13 @@ export class IncidentsAdapter {
   static toIncident(incident: IncidentResponse): Incident {
     return {
       id: incident.id.toString(),
-      id_parcela: incident.id_parcela,
-      tipo_incidencia: incident.tipo_incidencia,
-      descripcion: incident.descripcion,
-      impacto_kg: incident.impacto_kg,
-      nueva_fecha: incident.nueva_fecha,
-      estado_actual: incident.estado_actual,
-      observaciones: incident.observaciones,
+      parcelID: incident.id_parcela,
+      type: incident.tipo_incidencia,
+      description: incident.descripcion,
+      impactKg: incident.impacto_kg,
+      data: incident.nueva_fecha,
+      status: incident.estado_actual,
+      observations: incident.observaciones,
     };
   }
 }

@@ -4,4 +4,6 @@ export * from "./incident.adapter";
 export * from "./map.adapter";
 export * from "./parcel.adapter";
 export * from "./response.adapter";
+export * from "./recollection.adapter";
+export * from "./route.adapter";
 export * from "./trace.adapter";

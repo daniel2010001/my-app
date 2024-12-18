@@ -29,7 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { loadAbortable } from "@/lib";
-import { Available, CarSchema, CarsType } from "@/models";
+import { CarsAvailable, CarSchema, CarsType } from "@/models";
 import { createCar } from "@/services";
 
 export function CarForm({ isOpen, toggle }: { isOpen: boolean; toggle: () => void }) {
@@ -39,7 +39,7 @@ export function CarForm({ isOpen, toggle }: { isOpen: boolean; toggle: () => voi
   });
 
   async function onSubmit(values: CarSchema) {
-    const response = await loadAbortable(createCar(CarsAdapter.toCarRequest(values)));
+    const response = await loadAbortable(createCar(CarsAdapter.toRequest(values)));
     if (!response || response instanceof Error)
       return toast.error("Error al guardar centro de acopio");
     toast.success("Centro de acopio guardado correctamente");
@@ -71,7 +71,7 @@ export function CarForm({ isOpen, toggle }: { isOpen: boolean; toggle: () => voi
                     </FormControl>
                     <SelectContent>
                       {Object.entries(CarsType).map(([key, value]) => (
-                        <SelectItem key={key} value={key}>
+                        <SelectItem key={`car-${key}`} value={key}>
                           {value}
                         </SelectItem>
                       ))}
@@ -131,8 +131,8 @@ export function CarForm({ isOpen, toggle }: { isOpen: boolean; toggle: () => voi
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.entries(Available).map(([key, value]) => (
-                        <SelectItem key={key} value={key}>
+                      {Object.entries(CarsAvailable).map(([key, value]) => (
+                        <SelectItem key={`vehicle-${key}`} value={key}>
                           {value}
                         </SelectItem>
                       ))}
